@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { adaptPosition, buildHoldings } from "../src/lib/data.ts";
+import { adaptPosition, buildHoldings } from "../src/lib/adapt.ts";
 import { flattenPositions } from "../src/lib/portfolio.ts";
 import { WS_TFSA } from "../src/fixtures/wealthsimple.ts";
 import type { AccountPosition } from "../src/lib/types.ts";
