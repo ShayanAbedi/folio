@@ -42,7 +42,9 @@ interface WorkerTokenResponse {
 
 function workerUrl(path: string): string {
   const base = prefs().authWorkerUrl;
-  if (!base || !/^https:\/\//.test(base) || base.includes("example.workers.dev")) {
+  // https only, except a local wrangler dev server.
+  const local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(base);
+  if (!base || (!/^https:\/\//.test(base) && !local) || base.includes("example.workers.dev")) {
     throw new AuthError("Auth Worker URL is not configured. Open the extension preferences.", "not-configured");
   }
   return `${base}${path}`;
