@@ -131,8 +131,9 @@ function fromOption(p: OptionsPosition, account: Account): FlatPosition | null {
   if (!o) return null;
   const units = typeof p.units === "number" ? p.units : 0;
   const price = typeof p.price === "number" ? p.price : null;
-  // Option prices are per share; contracts are 100 shares.
-  const marketValue = price !== null ? units * price * 100 : null;
+  // Option prices are per share; contracts are usually 100 shares.
+  const multiplier = typeof p.multiplier === "number" && p.multiplier > 0 ? p.multiplier : 100;
+  const marketValue = price !== null ? units * price * multiplier : null;
   const avg = typeof p.average_purchase_price === "number" ? p.average_purchase_price : null; // per contract
   const openPnl = marketValue !== null && avg !== null ? marketValue - avg * units : null;
   const underlying = o.underlying_symbol?.symbol ?? o.ticker;

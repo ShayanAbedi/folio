@@ -2,7 +2,8 @@
 import { snaptrade } from "./api";
 import type {
   Account,
-  AccountHoldings,
+  AllAccountPositionsResponse,
+  Balance,
   AccountValueHistoryResponse,
   Activity,
   BrokerageAuthorization,
@@ -14,8 +15,17 @@ export function listAccounts(fresh = false): Promise<Account[]> {
   return snaptrade<Account[]>("/accounts", { fresh, ttlMs: 120_000 });
 }
 
-export function getAccountHoldings(accountId: string, fresh = false): Promise<AccountHoldings> {
-  return snaptrade<AccountHoldings>(`/accounts/${encodeURIComponent(accountId)}/holdings`, { fresh, ttlMs: 90_000 });
+/** GET /accounts/{id}/balances. (The older /holdings endpoint returns 410 for newer SnapTrade accounts.) */
+export function getAccountBalances(accountId: string, fresh = false): Promise<Balance[]> {
+  return snaptrade<Balance[]>(`/accounts/${encodeURIComponent(accountId)}/balances`, { fresh, ttlMs: 90_000 });
+}
+
+/** GET /accounts/{id}/positions/all: equities, ETFs, crypto, funds and options in one list. */
+export function getAccountPositions(accountId: string, fresh = false): Promise<AllAccountPositionsResponse> {
+  return snaptrade<AllAccountPositionsResponse>(`/accounts/${encodeURIComponent(accountId)}/positions/all`, {
+    fresh,
+    ttlMs: 90_000,
+  });
 }
 
 export async function getBalanceHistory(accountId: string, fresh = false): Promise<AccountValueHistoryResponse | null> {

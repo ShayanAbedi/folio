@@ -83,8 +83,49 @@ export interface OptionsPosition {
   };
   price?: number | null;
   units?: number;
+  /** Cost basis per contract. */
   average_purchase_price?: number | null;
   currency?: CurrencyRef | null;
+  /** Shares per contract; SnapTrade reports it on the new positions endpoint. Defaults to 100. */
+  multiplier?: number;
+}
+
+/** Instrument as returned by GET /accounts/{id}/positions/all (the replacement for the deprecated /holdings). */
+export interface Instrument {
+  kind: string;
+  id: string;
+  symbol: string;
+  raw_symbol?: string;
+  description?: string | null;
+  currency?: string | null;
+  exchange?: string | null;
+  // option-only
+  option_type?: "CALL" | "PUT";
+  strike_price?: string;
+  expiration_date?: string;
+  multiplier?: string;
+  underlying?: {
+    symbol?: string;
+    raw_symbol?: string;
+    description?: string | null;
+    currency?: string | null;
+    exchange?: string | null;
+  };
+}
+
+export interface AccountPosition {
+  instrument: Instrument;
+  units?: string | null;
+  price?: string | null;
+  /** Average purchase price per share (per share for options too). */
+  cost_basis?: string | null;
+  currency?: string | null;
+  cash_equivalent?: boolean;
+}
+
+export interface AllAccountPositionsResponse {
+  results?: AccountPosition[];
+  data_freshness?: { as_of?: string };
 }
 
 export interface AccountHoldings {
