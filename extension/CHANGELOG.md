@@ -4,8 +4,7 @@
 
 - Sign in with SnapTrade (OAuth, PKCE, read-only) with token refresh and revoke through the Fathom auth worker
 - Show Portfolio: net worth per currency, accounts grouped by institution, holdings per account
-- Show Positions: every position across accounts in one searchable list with weights and open P&L
-- Search Position: look up a ticker across accounts
+- Show Positions: every position across accounts in one searchable list with weights and open P&L; optional ticker argument jumps straight to a holding
 - Show Activities: All / Trades / Dividends / Deposits across accounts
 - Show Fog: idle cash and how long it has been sitting, computed from activities
 - Connect Brokerage: read-only SnapTrade Connection Portal and connection status
