@@ -76,7 +76,7 @@ export default function SignInCommand() {
     );
   } else if (mode === "dev-personal-key") {
     lines.push(
-      "**Developer key mode is on.** Requests use your SnapTrade Personal API key as the Bearer token. OAuth sign-in is bypassed.",
+      "**Developer key mode is on.** Requests are HMAC-signed with your SnapTrade Personal API key (clientId + consumerKey). OAuth sign-in is bypassed.",
     );
   } else if (session === undefined) {
     lines.push("Checking session…");

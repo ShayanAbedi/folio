@@ -5,7 +5,8 @@ export interface FathomPreferences {
   oauthClientId: string;
   useFixtures: boolean;
   enableDevPersonalKey: boolean;
-  devPersonalApiKey?: string;
+  devClientId?: string;
+  devConsumerKey?: string;
 }
 
 export function prefs(): FathomPreferences {
@@ -15,7 +16,8 @@ export function prefs(): FathomPreferences {
     oauthClientId: (p.oauthClientId ?? "").trim(),
     useFixtures: Boolean(p.useFixtures),
     enableDevPersonalKey: Boolean(p.enableDevPersonalKey),
-    devPersonalApiKey: p.devPersonalApiKey?.trim() || undefined,
+    devClientId: p.devClientId?.trim() || undefined,
+    devConsumerKey: p.devConsumerKey?.trim() || undefined,
   };
 }
 
@@ -24,6 +26,6 @@ export type AuthMode = "fixtures" | "dev-personal-key" | "oauth";
 export function authMode(): AuthMode {
   const p = prefs();
   if (p.useFixtures) return "fixtures";
-  if (p.enableDevPersonalKey && p.devPersonalApiKey) return "dev-personal-key";
+  if (p.enableDevPersonalKey && p.devClientId && p.devConsumerKey) return "dev-personal-key";
   return "oauth";
 }

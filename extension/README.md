@@ -34,7 +34,7 @@ Nothing to paste: the OAuth client secret lives in a small worker run by the mai
 | Auth Worker URL | The maintainer's deployed `auth-worker` (see below). Pre-filled for the Store build. |
 | SnapTrade OAuth Client ID | Public identifier of the maintainer's SnapTrade OAuth app. Not a secret. |
 | Use bundled fixture data | Demo mode with sample Wealthsimple, Questrade and IBKR accounts. No network. |
-| Use a Personal API key (dev) | Developers only: bypass OAuth with your own SnapTrade Personal API key. Off by default and not meant for Store users. |
+| Use a Personal API key (dev) | Developers only: bypass OAuth with your own SnapTrade Personal API key (clientId + consumerKey; requests are HMAC-signed like the official SDK). Off by default and not meant for Store users. |
 
 ## How Fog is computed
 

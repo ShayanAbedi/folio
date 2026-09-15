@@ -1,7 +1,8 @@
 import { Cache } from "@raycast/api";
 
 export const SNAPTRADE_ISSUER = "https://api.snaptrade.com";
-export const SNAPTRADE_API_BASE = "https://api.snaptrade.com/api/v1";
+// Canonical root paths (e.g. /accounts). The old /api/v1 prefix still works but is marked deprecated.
+export const SNAPTRADE_API_BASE = "https://api.snaptrade.com";
 const DISCOVERY_URL = `${SNAPTRADE_ISSUER}/.well-known/oauth-authorization-server`;
 const CACHE_KEY = "oauth-discovery-v1";
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000;

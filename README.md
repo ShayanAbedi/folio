@@ -17,7 +17,7 @@ SnapTrade dashboard OAuth apps are *confidential* clients: exchanging, refreshin
 ```
 Raycast ──(PKCE authorize)──▶ dashboard.snaptrade.com
 Raycast ──(code + verifier)──▶ auth-worker ──(Basic + PKCE)──▶ api.snaptrade.com/oauth/token
-Raycast ──(Bearer)───────────▶ api.snaptrade.com/api/v1/accounts, /holdings, /activities …
+Raycast ──(Bearer)───────────▶ api.snaptrade.com/accounts, /holdings, /activities …
 ```
 
 ## Users

@@ -159,18 +159,26 @@
       "name": "enableDevPersonalKey",
       "title": "Developer",
       "label": "Use a SnapTrade Personal API key instead of OAuth (developers only)",
-      "description": "Bypass OAuth with your own SnapTrade Personal API key. For extension development only, not for Store users.",
+      "description": "Bypass OAuth with your own SnapTrade Personal API key (clientId + consumerKey, HMAC-signed requests). For extension development only, not for Store users.",
       "type": "checkbox",
       "required": false,
       "default": false
     },
     {
-      "name": "devPersonalApiKey",
-      "title": "Personal API Key (dev)",
-      "description": "Only used when the developer checkbox above is enabled. Stored by Raycast, never written to disk by Fathom.",
+      "name": "devClientId",
+      "title": "Personal Client ID (dev)",
+      "description": "SnapTrade Personal API clientId. Only used when the developer checkbox is enabled.",
+      "type": "textfield",
+      "required": false,
+      "placeholder": "YOUR-CLIENT-ID"
+    },
+    {
+      "name": "devConsumerKey",
+      "title": "Personal Consumer Key (dev)",
+      "description": "SnapTrade Personal API consumerKey. Stored by Raycast as a password preference; never written to disk by Fathom.",
       "type": "password",
       "required": false,
-      "placeholder": "st-personal-..."
+      "placeholder": "consumer key"
     }
   ],
   "dependencies": {
