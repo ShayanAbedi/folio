@@ -29,20 +29,14 @@ export default function MenuBarPortfolio() {
           : error
             ? "Sign in"
             : "—";
-  // The tinted arrow icon is the only direction indicator; the title carries the signed compact delta.
+  // Title layout: "<net worth> · ▲ <change>". The arrow glyph sits next to the number it describes; the icon stays neutral.
   const delta = privacy || !primaryChange || primaryChange.amount === 0 ? null : primaryChange.amount;
   const deltaText =
     delta === null
       ? ""
-      : ` ${delta > 0 ? "+" : "−"}${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
+      : ` · ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
   const titleWithChange = `${title}${deltaText}`;
-  const icon =
-    delta === null
-      ? Icon.Coins
-      : {
-          source: delta > 0 ? Icon.ArrowUpCircleFilled : Icon.ArrowDownCircleFilled,
-          tintColor: delta > 0 ? Color.Green : Color.Red,
-        };
+  const icon = Icon.Coins;
 
   return (
     <MenuBarExtra
@@ -79,7 +73,7 @@ export default function MenuBarPortfolio() {
                   subtitle={
                     c
                       ? mask(
-                          `${up ? "+" : "−"}${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot`,
+                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot`,
                           privacy,
                         )
                       : undefined
