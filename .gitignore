@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.test-build/
+.wrangler/
+
+# env / secrets — never commit
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+*.pem
+*.key
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+*.log

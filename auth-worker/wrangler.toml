@@ -1,0 +1,16 @@
+name = "fathom-auth"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+workers_dev = true
+
+# Secrets (never in this file, never in git):
+#   wrangler secret put SNAPTRADE_OAUTH_CLIENT_ID
+#   wrangler secret put SNAPTRADE_OAUTH_CLIENT_SECRET
+#
+# Plain vars:
+[vars]
+# Comma-separated allowlist of redirect URIs the extension may present. Must match what is registered
+# in the SnapTrade dashboard exactly. Raycast's Web redirect method uses this URL.
+ALLOWED_REDIRECT_URIS = "https://raycast.com/redirect?packageName=Extension,https://raycast.com/redirect/extension"
+# Optional: override the discovery document location (defaults to SnapTrade's).
+# SNAPTRADE_ISSUER = "https://api.snaptrade.com"

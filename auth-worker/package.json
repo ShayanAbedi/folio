@@ -1,0 +1,19 @@
+{
+  "name": "fathom-auth-worker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Stateless Cloudflare Worker that exchanges, refreshes and revokes SnapTrade OAuth tokens for the Fathom Raycast extension. Holds the confidential client secret so the extension never does.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types test/*.test.ts"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260915.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.132.0"
+  }
+}
