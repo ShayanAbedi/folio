@@ -3,7 +3,7 @@
   "name": "fathom",
   "title": "Fathom",
   "description": "Your portfolio in Raycast. Net worth, holdings, activities and idle cash from every brokerage connected to SnapTrade. Read-only.",
-  "icon": "icon.png",
+  "icon": "fathom.png",
   "author": "shayan_abedi",
   "categories": [
     "Finance"
