@@ -1,9 +1,9 @@
-import { Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@raycast/api";
+import { Color, Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@raycast/api";
 import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
 import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, dayChange, fogIdleLabel, groupByInstitution, netWorth } from "./lib/portfolio";
-import { formatMoney, formatMoneyWithCode, formatSigned, MASK, mask } from "./lib/format";
+import { formatMoney, formatMoneyWithCode, MASK, mask } from "./lib/format";
 import { classifyError } from "./components/empty";
 import { launch } from "./components/actions";
 
@@ -29,14 +29,26 @@ export default function MenuBarPortfolio() {
           : error
             ? "Sign in"
             : "—";
-  const titleWithChange =
-    privacy || !primaryChange ? title : `${title} ${formatSigned(primaryChange.amount, primaryChange.currency)}`;
+  // Menu bar titles are plain text, so the ▲/▼ glyph carries direction and the tinted icon carries colour.
+  const delta = privacy || !primaryChange || primaryChange.amount === 0 ? null : primaryChange.amount;
+  const deltaText =
+    delta === null
+      ? ""
+      : ` ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
+  const titleWithChange = `${title}${deltaText}`;
+  const icon =
+    delta === null
+      ? Icon.Coins
+      : {
+          source: delta > 0 ? Icon.ArrowUpCircleFilled : Icon.ArrowDownCircleFilled,
+          tintColor: delta > 0 ? Color.Green : Color.Red,
+        };
 
   return (
     <MenuBarExtra
-      icon={Icon.Coins}
+      icon={icon}
       title={titleWithChange}
-      tooltip="Fathom · net worth"
+      tooltip="Fathom · net worth. ▲/▼ is the change vs the previous SnapTrade balance snapshot and includes deposits."
       isLoading={isLoading || acts.isLoading}
     >
       {error && accounts.length === 0 ? (
@@ -51,11 +63,27 @@ export default function MenuBarPortfolio() {
           <MenuBarExtra.Section title="Net Worth">
             {nw.byCurrency.map((t) => {
               const c = change?.find((x) => x.currency === t.currency);
+              const up = (c?.amount ?? 0) >= 0;
               return (
                 <MenuBarExtra.Item
                   key={t.currency}
+                  icon={
+                    c && !privacy
+                      ? {
+                          source: up ? Icon.ArrowUpCircleFilled : Icon.ArrowDownCircleFilled,
+                          tintColor: up ? Color.Green : Color.Red,
+                        }
+                      : Icon.Coins
+                  }
                   title={mask(formatMoneyWithCode(t.amount, t.currency), privacy)}
-                  subtitle={c ? mask(`${formatSigned(c.amount, c.currency)} today`, privacy) : undefined}
+                  subtitle={
+                    c
+                      ? mask(
+                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot`,
+                          privacy,
+                        )
+                      : undefined
+                  }
                   onAction={() => launch("show-portfolio")}
                 />
               );
