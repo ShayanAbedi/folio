@@ -143,7 +143,7 @@
       "description": "Public client_id of the SnapTrade OAuth app registered by the maintainer. Not a secret.",
       "type": "textfield",
       "required": false,
-      "default": "",
+      "default": "kvMk9gebqjFjx2ZFtG6IU0_KKJZjiIuW",
       "placeholder": "snaptrade-oauth-client-id"
     },
     {
