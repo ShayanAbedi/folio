@@ -29,12 +29,12 @@ export default function MenuBarPortfolio() {
           : error
             ? "Sign in"
             : "—";
-  // Menu bar titles are plain text, so the ▲/▼ glyph carries direction and the tinted icon carries colour.
+  // The tinted arrow icon is the only direction indicator; the title carries the signed compact delta.
   const delta = privacy || !primaryChange || primaryChange.amount === 0 ? null : primaryChange.amount;
   const deltaText =
     delta === null
       ? ""
-      : ` ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
+      : ` ${delta > 0 ? "+" : "−"}${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
   const titleWithChange = `${title}${deltaText}`;
   const icon =
     delta === null
@@ -48,7 +48,7 @@ export default function MenuBarPortfolio() {
     <MenuBarExtra
       icon={icon}
       title={titleWithChange}
-      tooltip="Fathom · net worth. ▲/▼ is the change vs the previous SnapTrade balance snapshot and includes deposits."
+      tooltip="Fathom · net worth. The arrow is the change vs the previous SnapTrade balance snapshot and includes deposits."
       isLoading={isLoading || acts.isLoading}
     >
       {error && accounts.length === 0 ? (
@@ -79,7 +79,7 @@ export default function MenuBarPortfolio() {
                   subtitle={
                     c
                       ? mask(
-                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot`,
+                          `${up ? "+" : "−"}${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot`,
                           privacy,
                         )
                       : undefined
