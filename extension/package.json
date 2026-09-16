@@ -36,7 +36,6 @@
     {
       "name": "show-portfolio",
       "title": "Show Portfolio",
-      "subtitle": "SnapTrade",
       "description": "Net worth and accounts grouped by institution, with holdings per account.",
       "mode": "view",
       "keywords": [
@@ -48,7 +47,6 @@
     {
       "name": "show-positions",
       "title": "Show Positions",
-      "subtitle": "SnapTrade",
       "description": "Every position across all accounts in one searchable list. Pass a ticker to jump straight to it.",
       "mode": "view",
       "keywords": [
@@ -71,7 +69,6 @@
     {
       "name": "show-fog",
       "title": "Show Fog",
-      "subtitle": "SnapTrade",
       "description": "How much cash is sitting idle and for how long.",
       "mode": "view",
       "keywords": [
@@ -83,7 +80,6 @@
     {
       "name": "show-activities",
       "title": "Show Activities",
-      "subtitle": "SnapTrade",
       "description": "Trades, dividends and deposits across all accounts.",
       "mode": "view",
       "keywords": [
@@ -96,7 +92,6 @@
     {
       "name": "connect-brokerage",
       "title": "Connect Brokerage",
-      "subtitle": "SnapTrade",
       "description": "Open the SnapTrade Connection Portal to link a brokerage (read-only) and review existing connections.",
       "mode": "view",
       "keywords": [
@@ -108,7 +103,6 @@
     {
       "name": "menu-bar-portfolio",
       "title": "Menu Bar Portfolio",
-      "subtitle": "SnapTrade",
       "description": "Net worth in the menu bar, with per-account totals and idle cash.",
       "mode": "menu-bar",
       "interval": "15m",
