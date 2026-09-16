@@ -1,8 +1,21 @@
+<p align="center"><img src="extension/assets/fathom-mark.png" width="128" alt="Fathom"></p>
+
 # Fathom
 
 **Your portfolio in Raycast.** A keyboard-first, read-only view of every brokerage account you've connected through [SnapTrade](https://snaptrade.com): net worth, holdings, activities, and *Fog*, the cash you've left idle.
 
 Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerage SnapTrade supports. MIT licensed. Read-only by design: Fathom cannot place trades or move money.
+
+![Show Portfolio: net worth and accounts by institution](extension/metadata/fathom-1.png)
+
+<details>
+<summary>More screenshots</summary>
+
+![Show Positions with the detail panel open](extension/metadata/fathom-2.png)
+
+![Show Fog: idle cash and how long it has been sitting](extension/metadata/fathom-3.png)
+
+</details>
 
 ## Install
 
