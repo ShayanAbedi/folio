@@ -54,39 +54,28 @@ a default with a sub-path prefixes every asset with it, so a build that forgets
 `SITE_URL` serves HTML that 404s its own CSS, JS and images. Upload `out/` to any
 static host.
 
-### Cloudflare
+### Vercel
 
-`wrangler.toml` deploys the site as an assets-only Worker — no Worker script, just the
-static export. Connect the repo in Workers & Pages and set:
+Root directory `site`; Vercel runs the `build` script, which generates the images
+before `next build`. `vercel.json` carries the cache and security headers — Vercel
+does not read Netlify/Cloudflare-style `_headers`, and Next's own `headers()` does
+nothing under `output: "export"`, so this file is the only place they can live.
 
-| Setting | Value |
-| --- | --- |
-| Root directory | `site` |
-| Build command | `npm run build` |
-| Deploy command | `npx wrangler deploy` |
-| Environment variable | `SITE_URL` = the production URL |
-
-The first deploy lands on `https://<name>.<your-subdomain>.workers.dev`. Set `SITE_URL`
-to that (or to the custom domain, once there is one) and redeploy, so the canonical and
-Open Graph URLs match where the site actually lives. Leave it pointing at production:
-preview branches get their own hostnames and should still name production.
-
-`.node-version` pins Node 22 for the builder. `public/_headers` is copied into `out/`
-on every build and is what Cloudflare reads for cache and security headers: a year-long
-immutable cache on the content-hashed `_next/static` assets, a day on the screenshots
-(their filenames are stable, so they must be allowed to go stale), and a
-`default-src 'none'` CSP.
+Vercel already sets `immutable` caching on `_next/static` and HSTS on everything, so
+`vercel.json` only adds what it doesn't: the security headers, a `default-src 'none'`
+CSP, and a one-day cache on the screenshots (their filenames are stable rather than
+content-hashed, so they must be allowed to go stale).
 
 That CSP is only possible because the page loads nothing from anywhere else. It needs
 `'unsafe-inline'` for scripts — a static export has no server to mint nonces for Next's
 two hydration scripts — but sources stay limited to `'self'`, which is what turns the
-page's "no third-party scripts" claim into something the browser enforces.
+page's "no third-party scripts" claim into something the browser enforces. Turning on
+Vercel Analytics would still be first-party and pass the CSP, but it would make the
+privacy section's "no analytics, no telemetry" untrue — change the copy if you enable it.
 
-Classic Cloudflare Pages works too, with root directory `site`, build `npm run build`
-and output directory `out`; it ignores `wrangler.toml`.
-
-Note that GitHub Pages cannot build this on its own — it only runs Jekyll — so it would
-need an Actions workflow to run `npm run build` and publish `out/`.
+Other hosts work the same way; only the header file differs. Cloudflare reads a
+`public/_headers` file, and an assets-only `wrangler.toml` deploying `out/` is in the
+git history at 34b887e if that route is ever wanted again.
 
 ## When the Raycast Store listing clears review
 

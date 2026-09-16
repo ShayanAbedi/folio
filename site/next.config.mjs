@@ -14,7 +14,7 @@
  * URL wrong — it 404s its own CSS, JS and images wherever it is served. Getting the
  * host wrong should stay cosmetic; keep any new default path-free.
  */
-const siteUrl = (process.env.SITE_URL ?? "https://folio.shayanabedi-dev.workers.dev").replace(/\/$/, "");
+const siteUrl = (process.env.SITE_URL ?? "https://folioext.com").replace(/\/$/, "");
 const basePath = (process.env.BASE_PATH ?? new URL(siteUrl).pathname).replace(/\/$/, "");
 
 /** @type {import('next').NextConfig} */

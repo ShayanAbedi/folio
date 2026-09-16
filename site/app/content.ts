@@ -25,5 +25,4 @@ export const ONE_LINER =
 export const asset = (p: string) => `${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}${p}`;
 
 /** Origin (plus sub-path, if any) the build is deployed at. Set via SITE_URL; see next.config.mjs. */
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://folio.shayanabedi-dev.workers.dev";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://folioext.com";
