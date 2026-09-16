@@ -2,56 +2,51 @@
 
 **Your portfolio in Raycast.** A keyboard-first, read-only view of every brokerage account you've connected through [SnapTrade](https://snaptrade.com): net worth, holdings, activities, and *Fog*, the cash you've left idle.
 
-MIT licensed. No trading. No proxying of your holdings through anyone's server.
+Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerage SnapTrade supports. MIT licensed. Read-only by design: Fathom cannot place trades or move money.
 
-```
-fathom/
-├── extension/    Raycast Store extension (TypeScript, @raycast/api)
-└── auth-worker/  Tiny stateless Cloudflare Worker holding the SnapTrade OAuth client secret
-```
+## Install
 
-## Why two pieces
-
-SnapTrade dashboard OAuth apps are *confidential* clients: exchanging, refreshing and revoking tokens needs HTTP Basic `client_id:client_secret` on top of PKCE. A Raycast extension is public code, so the secret can't live there. The worker does exactly those three calls and nothing else. Every portfolio read goes straight from Raycast to `api.snaptrade.com` with the user's own Bearer token.
-
-```
-Raycast ──(PKCE authorize)──▶ dashboard.snaptrade.com
-Raycast ──(code + verifier)──▶ auth-worker ──(Basic + PKCE)──▶ api.snaptrade.com/oauth/token
-Raycast ──(Bearer)───────────▶ api.snaptrade.com/accounts, /holdings, /activities …
-```
-
-## Users
-
-Install Fathom from the Raycast Store, run **Sign in with SnapTrade**, then **Connect Brokerage** if you haven't linked one yet. See [`extension/README.md`](extension/README.md).
-
-Until the Store listing is live, install from source (needs macOS, Raycast and Node 20+):
+Until the Raycast Store listing is live, install from source. You need macOS, [Raycast](https://raycast.com) and Node 20+.
 
 ```bash
 git clone https://github.com/ShayanAbedi/fathom && cd fathom/extension && npm install && npx ray develop
 ```
 
-Once it has built you can stop it with Ctrl+C; the extension stays installed under Raycast's "Extension Development" section. You'll need a [SnapTrade](https://snaptrade.com) account with at least one brokerage connected.
+Once it has built you can stop it with Ctrl+C; Fathom stays installed under Raycast's "Extension Development" section. To update later, `git pull` and run the same command again.
 
-## Maintainers
+You'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?personal=) with at least one brokerage connected. Fathom's **Connect Brokerage** command can open the connection portal for you after you sign in.
 
-1. Register a SnapTrade OAuth app and note the `client_id` / `client_secret`.
-2. Deploy the worker with the secret in its environment: [`auth-worker/README.md`](auth-worker/README.md).
-3. Set the worker URL and client_id defaults in `extension/package.json`, then `npm run lint && npm run build` in `extension/`.
+## Use
 
-Demo mode (`Use bundled fixture data` preference) renders sample Wealthsimple, Questrade and IBKR accounts without any network access; it's what the Store screenshots use.
+1. Run **Sign in with SnapTrade**. Your browser opens SnapTrade's consent page; approve read-only access and Raycast picks it up from there. Nothing to paste.
+2. Run **Show Portfolio**.
 
-## Development
+| Command | What it shows |
+| --- | --- |
+| Show Portfolio | Net worth per currency, accounts by institution, holdings per account |
+| Show Positions | Every position across accounts, searchable. `Show Positions AAPL` jumps straight to a ticker |
+| Show Activities | All · Trades · Dividends · Deposits for the last 365 days |
+| Show Fog | Idle cash: how much is sitting undeployed and for how long |
+| Connect Brokerage | Link another brokerage, or repair a disabled connection |
+| Menu Bar Portfolio | Net worth in the menu bar, with per-account totals and Fog |
+| Sign in with SnapTrade | Start or end your session |
 
-```bash
-cd extension && npm install && npm run dev
-```
+Everywhere: **⌘⇧P** hides every balance (privacy mode), **⌘R** refreshes, **⌘I** toggles position details.
 
-```bash
-cd extension && npm test
-```
+## What Fog means
 
-```bash
-cd auth-worker && npm install && npm test
-```
+Fog is cash that isn't doing anything. The amount is your cash balance across accounts. The idle days are counted from the later of your last buy and your last deposit. If neither happened in the last 365 days, Fathom says "365+" rather than guessing. It understates on purpose.
 
-Nothing secret is ever committed: `.dev.vars`, `.env*` and keys are gitignored, and the extension has no place to put a secret in the first place.
+## Privacy and security
+
+- **Read-only.** SnapTrade OAuth sessions can't trade. Fathom only ever reads accounts, balances, positions and activities.
+- **Your data goes straight from Raycast to SnapTrade.** Nothing about your portfolio passes through any other server.
+- **Tokens stay on your Mac**, stored by Raycast's encrypted OAuth store. Signing out revokes them at SnapTrade and deletes them locally.
+- **The one piece of server code** is a small, open-source Cloudflare Worker in [`auth-worker/`](auth-worker/) that turns your one-time sign-in code into tokens. It holds no user data and keeps no logs of tokens. Its threat model is written up in [SECURITY.md](SECURITY.md).
+- **Demo mode** (the "Use bundled fixture data" preference) renders invented sample accounts without any network access, if you want to try Fathom before signing in.
+
+Found a security problem? See [SECURITY.md](SECURITY.md).
+
+## Contributing
+
+Bug reports and pull requests are welcome. Setup, tests, and how to run your own auth worker are in [CONTRIBUTING.md](CONTRIBUTING.md).

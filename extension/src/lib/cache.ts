@@ -25,6 +25,8 @@ export function cacheSet<T>(key: string, value: T): void {
   cache.set(key, JSON.stringify({ at: Date.now(), value } satisfies Entry<T>));
 }
 
+/** Clears the HTTP cache and Raycast's default cache namespace (where useCachedPromise keeps rendered data). */
 export function cacheClear(): void {
   cache.clear();
+  new Cache().clear();
 }

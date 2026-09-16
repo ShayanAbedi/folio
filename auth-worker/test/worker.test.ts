@@ -120,3 +120,21 @@ test("healthz reports configuration without leaking values", async () => {
   const body = (await res.json()) as Record<string, unknown>;
   assert.deepEqual(body, { ok: true, configured: true });
 });
+
+test("rate limiter rejects with 429 when the binding says no", async () => {
+  const calls: { url: string; init?: RequestInit }[] = [];
+  const f = fakeFetch(calls, () => new Response("{}", { status: 200 }));
+  const limited: Env = { ...env, RATE_LIMITER: { limit: async () => ({ success: false }) } };
+  const res = await handle(post("/oauth/refresh", { refresh_token: "rt" }), limited, f);
+  assert.equal(res.status, 429);
+  assert.equal(calls.length, 0, "nothing forwarded upstream");
+  const ok: Env = { ...env, RATE_LIMITER: { limit: async () => ({ success: true }) } };
+  assert.equal((await handle(post("/oauth/refresh", { refresh_token: "rt" }), ok, f)).status, 200);
+});
+
+test("responses carry no-store and nosniff, and no CORS headers", async () => {
+  const res = await handle(new Request("https://worker.test/healthz"), env);
+  assert.equal(res.headers.get("cache-control"), "no-store");
+  assert.equal(res.headers.get("x-content-type-options"), "nosniff");
+  assert.equal(res.headers.get("access-control-allow-origin"), null);
+});

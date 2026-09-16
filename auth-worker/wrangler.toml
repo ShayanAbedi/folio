@@ -17,3 +17,11 @@ ALLOWED_REDIRECT_URIS = "https://raycast.com/redirect?packageName=Extension,http
 
 # Disable per-version preview URLs; only the production URL should exist.
 preview_urls = false
+
+# Per-IP rate limit on the OAuth endpoints (Workers rate-limit binding, wrangler >= 4.36).
+# 30 requests per minute per client IP is far above what one Raycast user needs
+# (a sign-in is one call, a refresh is one call every ten hours).
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 30, period = 60 }

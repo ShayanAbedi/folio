@@ -19,6 +19,8 @@ export interface Env {
   SNAPTRADE_OAUTH_CLIENT_SECRET: string;
   ALLOWED_REDIRECT_URIS?: string;
   SNAPTRADE_ISSUER?: string;
+  /** Optional Workers rate-limit binding (see wrangler.toml). Per client IP. */
+  RATE_LIMITER?: { limit(options: { key: string }): Promise<{ success: boolean }> };
 }
 
 interface Discovery {
@@ -33,7 +35,12 @@ const MAX_BODY_BYTES = 16 * 1024;
 
 let discoveryCache: { at: number; issuer: string; doc: Discovery } | null = null;
 
-const JSON_HEADERS = { "Content-Type": "application/json", "Cache-Control": "no-store" };
+const JSON_HEADERS = {
+  "Content-Type": "application/json",
+  "Cache-Control": "no-store",
+  "X-Content-Type-Options": "nosniff",
+  // No CORS headers on purpose: browsers must not be able to call this from web pages.
+};
 
 function json(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status, headers: JSON_HEADERS });
@@ -135,6 +142,11 @@ export async function handle(request: Request, env: Env, fetcher: typeof fetch =
   }
   if (request.method !== "POST") {
     return oauthError(405, "invalid_request", "POST only");
+  }
+  if (env.RATE_LIMITER) {
+    const ip = request.headers.get("cf-connecting-ip") ?? "unknown";
+    const { success } = await env.RATE_LIMITER.limit({ key: ip });
+    if (!success) return oauthError(429, "slow_down", "too many requests from this address; try again in a minute");
   }
   if (!env.SNAPTRADE_OAUTH_CLIENT_ID || !env.SNAPTRADE_OAUTH_CLIENT_SECRET) {
     return oauthError(500, "server_error", "worker is missing SNAPTRADE_OAUTH_CLIENT_ID / SNAPTRADE_OAUTH_CLIENT_SECRET");
