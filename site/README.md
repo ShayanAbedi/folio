@@ -49,7 +49,10 @@ SITE_URL=https://folio.example npm run build          # root domain
 SITE_URL=https://shayanabedi.github.io/folio npm run build   # project sub-path
 ```
 
-The default is `https://shayanabedi.github.io/folio`. Upload `out/` to any static host.
+The default is `https://folio.shayanabedi-dev.workers.dev`. It is path-free on purpose:
+a default with a sub-path prefixes every asset with it, so a build that forgets
+`SITE_URL` serves HTML that 404s its own CSS, JS and images. Upload `out/` to any
+static host.
 
 ### Cloudflare
 

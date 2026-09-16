@@ -8,8 +8,13 @@
  *   SITE_URL=https://shayanabedi.github.io/folio npm run build
  * basePath is taken from SITE_URL's path, so canonical URLs and asset paths cannot
  * drift apart. BASE_PATH overrides it if the two ever need to differ.
+ *
+ * The default is deliberately a root-path URL. A default carrying a sub-path prefixes
+ * every asset with it, so a build that forgets SITE_URL doesn't just get the canonical
+ * URL wrong — it 404s its own CSS, JS and images wherever it is served. Getting the
+ * host wrong should stay cosmetic; keep any new default path-free.
  */
-const siteUrl = (process.env.SITE_URL ?? "https://shayanabedi.github.io/folio").replace(/\/$/, "");
+const siteUrl = (process.env.SITE_URL ?? "https://folio.shayanabedi-dev.workers.dev").replace(/\/$/, "");
 const basePath = (process.env.BASE_PATH ?? new URL(siteUrl).pathname).replace(/\/$/, "");
 
 /** @type {import('next').NextConfig} */
