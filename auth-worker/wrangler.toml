@@ -14,3 +14,6 @@ workers_dev = true
 ALLOWED_REDIRECT_URIS = "https://raycast.com/redirect?packageName=Extension,https://raycast.com/redirect/extension"
 # Optional: override the discovery document location (defaults to SnapTrade's).
 # SNAPTRADE_ISSUER = "https://api.snaptrade.com"
+
+# Disable per-version preview URLs; only the production URL should exist.
+preview_urls = false

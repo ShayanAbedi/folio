@@ -126,7 +126,7 @@
       "description": "URL of the deployed Fathom auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
       "type": "textfield",
       "required": false,
-      "default": "https://fathom-auth.example.workers.dev",
+      "default": "https://fathom-auth.shayanabedi-dev.workers.dev",
       "placeholder": "https://fathom-auth.<your-subdomain>.workers.dev"
     },
     {
