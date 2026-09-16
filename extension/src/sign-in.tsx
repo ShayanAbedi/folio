@@ -10,6 +10,7 @@ type Session = Awaited<ReturnType<typeof sessionInfo>>;
 export default function SignInCommand() {
   const [session, setSession] = useState<Session | undefined>(undefined);
   const [busy, setBusy] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
   const mode = authMode();
   const p = prefs();
 
@@ -40,6 +41,7 @@ export default function SignInCommand() {
   const doSignIn = async () => {
     setBusy(true);
     const toast = await showToast({ style: Toast.Style.Animated, title: "Opening SnapTrade…" });
+    setLastError(null);
     try {
       await signIn();
       cacheClear();
@@ -104,6 +106,9 @@ export default function SignInCommand() {
       "",
       "Sign in opens SnapTrade in your browser. After you approve read-only access, Raycast receives a one-time code and the Fathom auth worker exchanges it for tokens. The OAuth client secret never leaves the worker.",
     );
+  }
+  if (lastError) {
+    lines.push("", `> ❌ Last sign-in attempt failed: ${lastError}`);
   }
   if (mode === "oauth" && !configured) {
     lines.push(
