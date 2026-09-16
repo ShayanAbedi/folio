@@ -1,4 +1,4 @@
-# Fathom
+# Fathom Portfolio
 
 Your portfolio in Raycast. Net worth, holdings, activities and idle cash from every brokerage you've connected through [SnapTrade](https://snaptrade.com). Keyboard-first, read-only, MIT.
 

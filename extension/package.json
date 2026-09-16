@@ -1,7 +1,7 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "fathom",
-  "title": "Fathom",
+  "name": "fathom-portfolio",
+  "title": "Fathom Portfolio",
   "description": "Net worth, holdings, activities and idle cash from every brokerage connected to SnapTrade, read-only.",
   "icon": "fathom-mark.png",
   "author": "shayan_abedi",
