@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Detail, Icon, openExtensionPreferences, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Detail, Icon, openExtensionPreferences, showToast, Toast } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import { AuthError, redirectUriForRegistration, sessionInfo, signIn, signOut } from "./lib/auth";
 import { authMode, prefs } from "./lib/preferences";
@@ -9,7 +9,6 @@ type Session = Awaited<ReturnType<typeof sessionInfo>>;
 
 export default function SignInCommand() {
   const [session, setSession] = useState<Session | undefined>(undefined);
-  const [redirectUri, setRedirectUri] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const mode = authMode();
   const p = prefs();
@@ -20,10 +19,23 @@ export default function SignInCommand() {
 
   useEffect(() => {
     reload();
-    redirectUriForRegistration()
-      .then(setRedirectUri)
-      .catch(() => setRedirectUri(""));
   }, [reload]);
+
+  // Only build an authorization request on explicit demand: creating one replaces the PKCE client's
+  // pending state, which would break a sign-in that is already open in the browser.
+  const copyRedirectUri = async () => {
+    try {
+      const uri = await redirectUriForRegistration();
+      await Clipboard.copy(uri);
+      await showToast({ style: Toast.Style.Success, title: "Redirect URI copied", message: uri });
+    } catch (e) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Couldn't build redirect URI",
+        message: e instanceof Error ? e.message : String(e),
+      });
+    }
+  };
 
   const doSignIn = async () => {
     setBusy(true);
@@ -127,7 +139,7 @@ export default function SignInCommand() {
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Auth worker" text={p.authWorkerUrl || "not set"} />
           <Detail.Metadata.Label title="Client ID" text={p.oauthClientId || "not set"} />
-          {redirectUri ? <Detail.Metadata.Label title="Redirect URI" text={redirectUri} /> : null}
+          <Detail.Metadata.Label title="Redirect URI" text="https://raycast.com/redirect?packageName=Extension" />
         </Detail.Metadata>
       }
       actions={
@@ -140,9 +152,13 @@ export default function SignInCommand() {
           )}
           {mode === "oauth" && signedIn && <Action title="Sign in Again" icon={Icon.Repeat} onAction={doSignIn} />}
           <Action title="Open Extension Preferences" icon={Icon.Gear} onAction={openExtensionPreferences} />
-          {redirectUri ? (
-            <Action.CopyToClipboard title="Copy Redirect URI (for OAuth App Registration)" content={redirectUri} />
-          ) : null}
+          {mode === "oauth" && !busy && (
+            <Action
+              title="Copy Redirect URI (for OAuth App Registration)"
+              icon={Icon.Clipboard}
+              onAction={copyRedirectUri}
+            />
+          )}
           <Action.OpenInBrowser title="Open SnapTrade Dashboard" url="https://dashboard.snaptrade.com" />
           <NavigationActions />
         </ActionPanel>
