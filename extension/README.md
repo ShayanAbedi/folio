@@ -51,7 +51,7 @@ SnapTrade dashboard OAuth apps are confidential clients: the token, refresh and 
 
 Local development: `npm install`, `npm run dev`. `npm test` runs the pure portfolio math against the fixtures.
 
-Screenshots: the three images in `metadata/` are rendered from the fixtures by `node scripts/screenshots.mjs` (headless Chrome, 2000×1250) so they contain no real balances. Before a Store submission, replace them with real captures from Raycast's *Window Capture* command with demo mode on.
+Screenshots: the three images in `metadata/` are Raycast Window Capture shots taken in demo mode, so they contain no real balances.
 
 ## Security notes
 
