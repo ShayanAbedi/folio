@@ -13,7 +13,9 @@ Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerag
 
 ![Show Positions with the detail panel open](extension/metadata/folio-2.png)
 
-![Show Fog: idle cash and how long it has been sitting](extension/metadata/folio-3.png)
+![Show Activities: trades, dividends and deposits across accounts](extension/metadata/folio-3.png)
+
+![Show Fog: idle cash and how long it has been sitting](extension/metadata/folio-4.png)
 
 </details>
 
