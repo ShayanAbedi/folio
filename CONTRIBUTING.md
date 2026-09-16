@@ -22,11 +22,36 @@ Tests cover the pure modules only: portfolio math, Fog, the `/positions/all` ada
 
 ## Auth worker
 
-The extension defaults to the maintainer's deployed worker, so contributors don't need their own. If you are forking Fathom for your own SnapTrade OAuth app, [`auth-worker/README.md`](auth-worker/README.md) covers registering the app, setting secrets with `wrangler secret put`, the exact Raycast redirect URI, and deploying. Then point `authWorkerUrl` and `oauthClientId` in `extension/package.json` at your worker and client ID.
+The extension defaults to the maintainer's deployed worker, so contributors don't need their own. The worker is a stateless Cloudflare Worker that performs the three OAuth calls a confidential client can't make from inside an extension:
+
+| Method | Path | Body (JSON) | Returns |
+| --- | --- | --- | --- |
+| POST | `/oauth/token` | `{ grant_type: "authorization_code", code, code_verifier, redirect_uri }` | SnapTrade token response |
+| POST | `/oauth/refresh` | `{ refresh_token }` | New access token and rotated refresh token |
+| POST | `/oauth/revoke` | `{ token, token_type_hint? }` | `{ revoked: true }` |
+| GET | `/healthz` | – | `{ ok, configured }` |
 
 ```bash
 cd auth-worker && npm install && npm test
 ```
+
+### Running your own (forks)
+
+1. Register an OAuth app in the [SnapTrade dashboard](https://dashboard.snaptrade.com) → Settings → OAuth App. Add the redirect URI exactly: `https://raycast.com/redirect?packageName=Extension`. Copy the `client_id` and `client_secret`.
+2. `cd auth-worker && npx wrangler login`, then store the credentials as Worker secrets (never in `wrangler.toml`, never in git):
+
+   ```bash
+   npx wrangler secret put SNAPTRADE_OAUTH_CLIENT_ID
+   ```
+
+   ```bash
+   npx wrangler secret put SNAPTRADE_OAUTH_CLIENT_SECRET
+   ```
+
+3. `npm run deploy`. Wrangler prints the worker URL; `curl <url>/healthz` should report `configured: true`.
+4. Point `authWorkerUrl` and `oauthClientId` in `extension/package.json` at your worker URL and client ID.
+
+For local work, copy `auth-worker/.dev.vars.example` to `.dev.vars` (gitignored), fill it in, run `npm run dev`, and set the extension's *Auth Worker URL* preference to `http://localhost:8787`.
 
 ## Developer-only preferences
 
