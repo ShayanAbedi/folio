@@ -1,0 +1,27 @@
+{
+  "name": "folio-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Marketing site for Folio, a read-only portfolio extension for Raycast.",
+  "license": "MIT",
+  "scripts": {
+    "images": "node scripts/optimize-images.mjs",
+    "predev": "npm run images",
+    "dev": "next dev",
+    "build": "npm run images && next build",
+    "start": "npx serve out",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^16.3.5",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "sharp": "0.34.3",
+    "typescript": "5.7.2"
+  }
+}

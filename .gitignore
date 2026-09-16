@@ -19,3 +19,6 @@ dist/
 .idea/
 .vscode/
 *.log
+
+# agent / editor config
+.claude/

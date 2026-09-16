@@ -1,0 +1,30 @@
+# Cloudflare Pages reads this from the root of the published output. It lives in
+# public/ so Next copies it into out/ on every build.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: geolocation=(), camera=(), microphone=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000
+  # The page loads nothing from anywhere else — no analytics, no CDN, no webfont
+  # host — so the policy that matches it is default-src 'none' plus what it does use.
+  # script-src needs 'unsafe-inline' because a static export has no server to mint
+  # nonces for Next's two hydration scripts; sources are still limited to 'self',
+  # which is what makes the "no third-party scripts" claim on the page enforceable.
+  # data: is for the SVG dither in the hero glow.
+  Content-Security-Policy: default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+
+# Content-hashed by the build, so these can never go stale.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Stable filenames, so cache hard but let a replaced screenshot appear within a day.
+/shots/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.webp
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/og.png
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
