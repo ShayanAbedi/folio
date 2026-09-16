@@ -26,7 +26,7 @@ export class AuthError extends Error {
 export const client = new OAuth.PKCEClient({
   redirectMethod: OAuth.RedirectMethod.Web,
   providerName: "SnapTrade",
-  providerIcon: "snaptrade.png",
+  providerIcon: "fathom-mark.png",
   providerId: "snaptrade",
   description: "Fathom reads your portfolio through SnapTrade. Read-only: it can never place trades or move money.",
 });
