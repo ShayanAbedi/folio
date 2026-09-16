@@ -51,22 +51,27 @@ SITE_URL=https://shayanabedi.github.io/folio npm run build   # project sub-path
 
 The default is `https://shayanabedi.github.io/folio`. Upload `out/` to any static host.
 
-### Cloudflare Pages
+### Cloudflare
 
-Connect the repo and set:
+`wrangler.toml` deploys the site as an assets-only Worker — no Worker script, just the
+static export. Connect the repo in Workers & Pages and set:
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | None |
 | Root directory | `site` |
 | Build command | `npm run build` |
-| Build output directory | `out` |
+| Deploy command | `npx wrangler deploy` |
 | Environment variable | `SITE_URL` = the production URL |
 
+The first deploy lands on `https://<name>.<your-subdomain>.workers.dev`. Set `SITE_URL`
+to that (or to the custom domain, once there is one) and redeploy, so the canonical and
+Open Graph URLs match where the site actually lives. Leave it pointing at production:
+preview branches get their own hostnames and should still name production.
+
 `.node-version` pins Node 22 for the builder. `public/_headers` is copied into `out/`
-on every build and is what Cloudflare reads for cache and security headers: a
-year-long immutable cache on the content-hashed `_next/static` assets, a day on the
-screenshots (their filenames are stable, so they must be allowed to go stale), and a
+on every build and is what Cloudflare reads for cache and security headers: a year-long
+immutable cache on the content-hashed `_next/static` assets, a day on the screenshots
+(their filenames are stable, so they must be allowed to go stale), and a
 `default-src 'none'` CSP.
 
 That CSP is only possible because the page loads nothing from anywhere else. It needs
@@ -74,9 +79,8 @@ That CSP is only possible because the page loads nothing from anywhere else. It 
 two hydration scripts — but sources stay limited to `'self'`, which is what turns the
 page's "no third-party scripts" claim into something the browser enforces.
 
-Set `SITE_URL` to the production URL and leave it: preview deployments get their own
-`*.pages.dev` hostnames, and canonical and Open Graph URLs should point at production
-from any of them.
+Classic Cloudflare Pages works too, with root directory `site`, build `npm run build`
+and output directory `out`; it ignores `wrangler.toml`.
 
 Note that GitHub Pages cannot build this on its own — it only runs Jekyll — so it would
 need an Actions workflow to run `npm run build` and publish `out/`.
