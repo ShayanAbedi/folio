@@ -24,6 +24,14 @@ Raycast ──(Bearer)───────────▶ api.snaptrade.com/acc
 
 Install Fathom from the Raycast Store, run **Sign in with SnapTrade**, then **Connect Brokerage** if you haven't linked one yet. See [`extension/README.md`](extension/README.md).
 
+Until the Store listing is live, install from source (needs macOS, Raycast and Node 20+):
+
+```bash
+git clone https://github.com/ShayanAbedi/fathom && cd fathom/extension && npm install && npx ray develop
+```
+
+Once it has built you can stop it with Ctrl+C; the extension stays installed under Raycast's "Extension Development" section. You'll need a [SnapTrade](https://snaptrade.com) account with at least one brokerage connected.
+
 ## Maintainers
 
 1. Register a SnapTrade OAuth app and note the `client_id` / `client_secret`.
