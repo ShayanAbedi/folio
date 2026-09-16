@@ -51,7 +51,7 @@ export default function SignInCommand() {
     } catch (e) {
       toast.style = Toast.Style.Failure;
       toast.title =
-        e instanceof AuthError && e.reason === "not-configured" ? "Fathom isn't configured" : "Sign-in failed";
+        e instanceof AuthError && e.reason === "not-configured" ? "Folio isn't configured" : "Sign-in failed";
       toast.message = e instanceof Error ? e.message : String(e);
     } finally {
       setBusy(false);
@@ -84,7 +84,7 @@ export default function SignInCommand() {
   const lines: string[] = ["# Sign In with SnapTrade", ""];
   if (mode === "fixtures") {
     lines.push(
-      "**Demo mode is on.** Fathom is rendering bundled fixture data and won't call SnapTrade.",
+      "**Demo mode is on.** Folio is rendering bundled fixture data and won't call SnapTrade.",
       "",
       "Turn off *Use bundled fixture data* in preferences to use your own accounts.",
     );
@@ -98,13 +98,13 @@ export default function SignInCommand() {
     lines.push(
       `✅ Signed in${session?.email ? ` as **${session.email}**` : ""}.`,
       "",
-      "Fathom holds a read-only SnapTrade session. It can list accounts, holdings and activities. It cannot trade or move money.",
+      "Folio holds a read-only SnapTrade session. It can list accounts, holdings and activities. It cannot trade or move money.",
     );
   } else {
     lines.push(
       "You're signed out.",
       "",
-      "Sign in opens SnapTrade in your browser. After you approve read-only access, Raycast receives a one-time code and the Fathom auth worker exchanges it for tokens. The OAuth client secret never leaves the worker.",
+      "Sign in opens SnapTrade in your browser. After you approve read-only access, Raycast receives a one-time code and the Folio auth worker exchanges it for tokens. The OAuth client secret never leaves the worker.",
     );
   }
   if (lastError) {

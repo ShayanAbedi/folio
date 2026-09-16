@@ -1,7 +1,7 @@
 /**
- * Minimal, hand-written subset of the SnapTrade API models that Fathom reads.
+ * Minimal, hand-written subset of the SnapTrade API models that Folio reads.
  * Field names mirror the API (snake_case) so fixtures and live responses share one shape.
- * Everything here is read-only data; Fathom never writes to SnapTrade.
+ * Everything here is read-only data; Folio never writes to SnapTrade.
  */
 
 export interface CurrencyRef {
@@ -151,7 +151,7 @@ export interface Activity {
   settlement_date?: string;
   fee?: number;
   institution?: string;
-  /** Populated by the activities endpoint; Fathom also fills it in when it fans out per account. */
+  /** Populated by the activities endpoint; Folio also fills it in when it fans out per account. */
   account?: { id?: string; name?: string | null; number?: string } | null;
 }
 

@@ -17,12 +17,12 @@ function copy(kind: EmptyKind, error?: unknown) {
       return {
         icon: Icon.Person,
         title: "Sign in to SnapTrade",
-        description: "Fathom needs a read-only SnapTrade session to load your portfolio.",
+        description: "Folio needs a read-only SnapTrade session to load your portfolio.",
       };
     case "not-configured":
       return {
         icon: Icon.Gear,
-        title: "Fathom isn't configured yet",
+        title: "Folio isn't configured yet",
         description: "Set the Auth Worker URL and OAuth Client ID in preferences, or enable demo fixtures.",
       };
     case "connect":

@@ -1,8 +1,8 @@
-# Fathom Portfolio
+# Folio
 
 Your portfolio in Raycast. Net worth, holdings, activities and idle cash from every brokerage you've connected through [SnapTrade](https://snaptrade.com). Keyboard-first, read-only, MIT.
 
-Fathom never places trades or moves money. SnapTrade OAuth apps are read-only by design, and the extension only ever sends `Authorization: Bearer <your token>` to SnapTrade.
+Folio never places trades or moves money. SnapTrade OAuth apps are read-only by design, and the extension only ever sends `Authorization: Bearer <your token>` to SnapTrade.
 
 ## Commands
 
@@ -18,7 +18,7 @@ Fathom never places trades or moves money. SnapTrade OAuth apps are read-only by
 
 Everywhere: **⌘⇧P** hides balances (privacy mode), **⌘R** refreshes past the 60–120 s cache, **⌘I** toggles position details.
 
-## Using Fathom
+## Using Folio
 
 1. Run **Sign in with SnapTrade**. Your browser opens SnapTrade's consent page; approve read access.
 2. Run **Connect Brokerage** if you haven't linked a brokerage to SnapTrade yet. The Connection Portal opens in your browser and only asks for read-only access.
@@ -31,16 +31,16 @@ Nothing to paste. You'll need a [SnapTrade account](https://dashboard.snaptrade.
 | Preference | Purpose |
 | --- | --- |
 | Auth Worker URL | Pre-filled. The small open-source worker that exchanges your sign-in code for tokens. |
-| SnapTrade OAuth Client ID | Pre-filled. Public identifier of Fathom's SnapTrade OAuth app. Not a secret. |
+| SnapTrade OAuth Client ID | Pre-filled. Public identifier of Folio's SnapTrade OAuth app. Not a secret. |
 | Use bundled fixture data | Demo mode with invented Wealthsimple, Questrade and IBKR accounts. No network, no sign-in needed. |
 
 ## How Fog is computed
 
-Fog is cash that isn't doing anything. The amount is the sum of cash balances across accounts (per currency). The idle days are counted from the later of your last buy and your last deposit within the activity window. If neither happened inside the window, Fathom reports "365+" rather than guessing. It understates on purpose.
+Fog is cash that isn't doing anything. The amount is the sum of cash balances across accounts (per currency). The idle days are counted from the later of your last buy and your last deposit within the activity window. If neither happened inside the window, Folio reports "365+" rather than guessing. It understates on purpose.
 
 ## Security notes
 
-Fathom is read-only and keeps your data on your Mac. Details:
+Folio is read-only and keeps your data on your Mac. Details:
 
 - The extension never sends `clientId`, `consumerKey`, `userId`, `userSecret`, `timestamp` or a `Signature` header. Bearer only.
 - Tokens are stored through `OAuth.PKCEClient.setTokens`. Sign out revokes the refresh token through the worker and then removes both tokens.
@@ -49,4 +49,4 @@ Fathom is read-only and keeps your data on your Mac. Details:
 - Portfolio data goes directly from Raycast to SnapTrade. The only server component, the open-source auth worker, sees your one-time sign-in code and tokens in transit and stores nothing.
 - Responses are cached on disk by Raycast for fast reopening; sign-out clears that cache.
 
-Source, threat model and how to report a problem: https://github.com/ShayanAbedi/fathom
+Source, threat model and how to report a problem: https://github.com/ShayanAbedi/folio

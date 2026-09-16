@@ -1,7 +1,7 @@
 import { LocalStorage } from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 
-const KEY = "fathom.privacy";
+const KEY = "folio.privacy";
 
 export async function getPrivacy(): Promise<boolean> {
   const v = await LocalStorage.getItem<string>(KEY);

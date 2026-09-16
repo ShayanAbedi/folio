@@ -3,7 +3,7 @@
  *
  * SnapTrade Dashboard OAuth apps are confidential clients: the token, refresh and revoke calls need
  * HTTP Basic client_id:client_secret on top of PKCE. The secret can never ship inside an extension,
- * so those three calls go through the Fathom auth worker (see /auth-worker). Everything else —
+ * so those three calls go through the Folio auth worker (see /auth-worker). Everything else —
  * building the authorization URL, PKCE, the callback, token storage — happens here with Raycast's
  * OAuth.PKCEClient. Data requests go straight to SnapTrade with `Authorization: Bearer`.
  */
@@ -26,9 +26,9 @@ export class AuthError extends Error {
 export const client = new OAuth.PKCEClient({
   redirectMethod: OAuth.RedirectMethod.Web,
   providerName: "SnapTrade",
-  providerIcon: "fathom-mark.png",
+  providerIcon: "folio.png",
   providerId: "snaptrade",
-  description: "Fathom reads your portfolio through SnapTrade. Read-only: it can never place trades or move money.",
+  description: "Folio reads your portfolio through SnapTrade. Read-only: it can never place trades or move money.",
 });
 
 interface WorkerTokenResponse {
@@ -64,7 +64,7 @@ async function workerPost<T>(path: string, body: Record<string, unknown>): Promi
     // non-JSON error body; handled below
   }
   if (!res.ok) {
-    console.log("[fathom-auth] worker error", {
+    console.log("[folio-auth] worker error", {
       path,
       status: res.status,
       error: json.error,
@@ -92,12 +92,12 @@ export async function signIn(): Promise<void> {
     scope: SCOPES,
     // Raycast adds response_type=code, state, code_challenge and code_challenge_method=S256 itself.
   });
-  console.log("[fathom-auth] opening consent page", {
+  console.log("[folio-auth] opening consent page", {
     endpoint: discovery.authorization_endpoint,
     redirectUri: request.redirectURI,
   });
   const { authorizationCode } = await client.authorize(request);
-  console.log("[fathom-auth] authorization code received, exchanging via worker", { worker: prefs().authWorkerUrl });
+  console.log("[folio-auth] authorization code received, exchanging via worker", { worker: prefs().authWorkerUrl });
   const tokens = await workerPost<WorkerTokenResponse>("/oauth/token", {
     grant_type: "authorization_code",
     code: authorizationCode,
@@ -105,7 +105,7 @@ export async function signIn(): Promise<void> {
     redirect_uri: request.redirectURI,
   });
   await client.setTokens(tokens);
-  console.log("[fathom-auth] tokens stored", { expiresIn: tokens.expires_in, scope: tokens.scope });
+  console.log("[folio-auth] tokens stored", { expiresIn: tokens.expires_in, scope: tokens.scope });
 }
 
 let refreshInFlight: Promise<string> | null = null;

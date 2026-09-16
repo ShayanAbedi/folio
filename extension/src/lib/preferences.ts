@@ -1,6 +1,6 @@
 import { getPreferenceValues } from "@raycast/api";
 
-export interface FathomPreferences {
+export interface FolioPreferences {
   authWorkerUrl: string;
   oauthClientId: string;
   useFixtures: boolean;
@@ -9,8 +9,8 @@ export interface FathomPreferences {
   devConsumerKey?: string;
 }
 
-export function prefs(): FathomPreferences {
-  const p = getPreferenceValues<FathomPreferences>();
+export function prefs(): FolioPreferences {
+  const p = getPreferenceValues<FolioPreferences>();
   return {
     authWorkerUrl: (p.authWorkerUrl ?? "").trim().replace(/\/+$/, ""),
     oauthClientId: (p.oauthClientId ?? "").trim(),

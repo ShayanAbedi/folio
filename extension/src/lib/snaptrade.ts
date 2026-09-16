@@ -1,4 +1,4 @@
-/** Typed SnapTrade endpoints used by Fathom. All GET except the Connection Portal link. */
+/** Typed SnapTrade endpoints used by Folio. All GET except the Connection Portal link. */
 import { snaptrade } from "./api";
 import type {
   Account,

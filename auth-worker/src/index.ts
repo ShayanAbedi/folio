@@ -1,5 +1,5 @@
 /**
- * Fathom auth worker.
+ * Folio auth worker.
  *
  * SnapTrade Dashboard OAuth apps are confidential clients: token exchange, refresh and revocation
  * require HTTP Basic client_id:client_secret in addition to PKCE. This worker holds that secret so

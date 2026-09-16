@@ -26,7 +26,7 @@ const FALLBACK: OAuthDiscovery = {
   code_challenge_methods_supported: ["S256"],
 };
 
-const cache = new Cache({ namespace: "fathom-discovery" });
+const cache = new Cache({ namespace: "folio-discovery" });
 
 function isValid(doc: unknown): doc is OAuthDiscovery {
   if (!doc || typeof doc !== "object") return false;

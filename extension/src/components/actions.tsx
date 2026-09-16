@@ -62,7 +62,7 @@ export function TradeStubAction() {
         showToast({
           style: Toast.Style.Failure,
           title: "Trading is not available",
-          message: "SnapTrade OAuth apps are read-only. Fathom can't place orders.",
+          message: "SnapTrade OAuth apps are read-only. Folio can't place orders.",
         })
       }
     />

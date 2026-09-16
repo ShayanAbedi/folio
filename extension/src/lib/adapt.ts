@@ -23,7 +23,7 @@ const KIND_LABEL: Record<string, string> = {
   option: "Option",
 };
 
-/** Maps one entry of /positions/all onto the Position / OptionsPosition shapes the rest of Fathom consumes. */
+/** Maps one entry of /positions/all onto the Position / OptionsPosition shapes the rest of Folio consumes. */
 export function adaptPosition(p: AccountPosition, account: Account): { position?: Position; option?: OptionsPosition } {
   const i = p.instrument;
   const units = num(p.units) ?? 0;

@@ -42,11 +42,11 @@ export default function MenuBarPortfolio() {
     <MenuBarExtra
       icon={icon}
       title={titleWithChange}
-      tooltip="Fathom · net worth. The arrow is the change vs the previous SnapTrade balance snapshot and includes deposits."
+      tooltip="Folio · net worth. The arrow is the change vs the previous SnapTrade balance snapshot and includes deposits."
       isLoading={isLoading || acts.isLoading}
     >
       {error && accounts.length === 0 ? (
-        <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Fathom"}>
+        <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Folio"}>
           <MenuBarExtra.Item
             title={classifyError(error) === "sign-in" ? "Sign in with SnapTrade…" : "Open Preferences…"}
             onAction={() => (classifyError(error) === "sign-in" ? launch("sign-in") : openExtensionPreferences())}

@@ -1,7 +1,7 @@
 import { Cache } from "@raycast/api";
 
 /** Small TTL cache on top of Raycast's Cache for GET responses (60–120 s). "Refresh" actions bypass it. */
-const cache = new Cache({ namespace: "fathom-http" });
+const cache = new Cache({ namespace: "folio-http" });
 export const DEFAULT_TTL_MS = 90_000;
 
 interface Entry<T> {

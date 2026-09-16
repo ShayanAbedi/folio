@@ -1,8 +1,8 @@
 {
-  "name": "fathom-auth-worker",
+  "name": "folio-auth-worker",
   "version": "1.0.0",
   "private": true,
-  "description": "Stateless Cloudflare Worker that exchanges, refreshes and revokes SnapTrade OAuth tokens for the Fathom Raycast extension. Holds the confidential client secret so the extension never does.",
+  "description": "Stateless Cloudflare Worker that exchanges, refreshes and revokes SnapTrade OAuth tokens for the Folio Raycast extension. Holds the confidential client secret so the extension never does.",
   "license": "MIT",
   "type": "module",
   "scripts": {

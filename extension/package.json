@@ -1,9 +1,9 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "fathom-portfolio",
-  "title": "Fathom Portfolio",
+  "name": "folio",
+  "title": "Folio",
   "description": "Net worth, holdings, activities and idle cash from every brokerage connected to SnapTrade, read-only.",
-  "icon": "fathom-mark.png",
+  "icon": "folio.png",
   "author": "shayan_abedi",
   "categories": [
     "Finance"
@@ -122,7 +122,7 @@
     {
       "name": "authWorkerUrl",
       "title": "Auth Worker URL",
-      "description": "URL of the deployed Fathom auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
+      "description": "URL of the deployed Folio auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
       "type": "textfield",
       "required": false,
       "default": "https://fathom-auth.shayanabedi-dev.workers.dev",
@@ -166,7 +166,7 @@
     {
       "name": "devConsumerKey",
       "title": "Personal Consumer Key (dev)",
-      "description": "SnapTrade Personal API consumerKey. Stored by Raycast as a password preference; never written to disk by Fathom.",
+      "description": "SnapTrade Personal API consumerKey. Stored by Raycast as a password preference; never written to disk by Folio.",
       "type": "password",
       "required": false,
       "placeholder": "consumer key"

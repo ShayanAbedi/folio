@@ -1,7 +1,7 @@
-# Contributing to Fathom
+# Contributing to Folio
 
 ```
-fathom/
+folio/
 ├── extension/    Raycast extension (TypeScript, @raycast/api)
 └── auth-worker/  Stateless Cloudflare Worker holding the SnapTrade OAuth client secret
 ```

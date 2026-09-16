@@ -36,7 +36,7 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
       ) : !isLoading && matches.length === 0 ? (
         <List.EmptyView
           title={`No position matches “${query}”`}
-          description="Fathom only searches what you already hold. It doesn't look up quotes."
+          description="Folio only searches what you already hold. It doesn't look up quotes."
         />
       ) : (
         <List.Section title={query ? `Matches for ${query.toUpperCase()}` : "Positions"} subtitle={`${matches.length}`}>
