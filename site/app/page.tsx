@@ -162,7 +162,7 @@ export default function Page() {
 
             <article className="feature feature--flip">
               <div className="feature__text">
-                <h2>Fog: cash you forgot</h2>
+                <h2>Know what your cash isn&rsquo;t doing.</h2>
                 <p>
                   How much cash is sitting undeployed, and for how long. Counted
                   from your last buy or deposit, whichever came later, so the
