@@ -1,4 +1,14 @@
-import { Action, ActionPanel, Clipboard, Detail, Icon, openExtensionPreferences, showToast, Toast } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Clipboard,
+  Detail,
+  environment,
+  Icon,
+  openExtensionPreferences,
+  showToast,
+  Toast,
+} from "@raycast/api";
 import { useCallback, useEffect, useState } from "react";
 import { AuthError, redirectUriForRegistration, sessionInfo, signIn, signOut } from "./lib/auth";
 import { authMode, prefs } from "./lib/preferences";
@@ -105,6 +115,12 @@ export default function SignInCommand() {
       "You're signed out.",
       "",
       "Sign in opens SnapTrade in your browser. After you approve read-only access, Raycast receives a one-time code and the Folio auth worker exchanges it for tokens. The OAuth client secret never leaves the worker.",
+    );
+  }
+  if (mode === "oauth" && !signedIn && environment.isDevelopment) {
+    lines.push(
+      "",
+      "> 🛠 Development build: if the overlay stays open after the browser returns, quit and reopen Raycast once. Raycast only routes OAuth callbacks to extensions that were present when it started.",
     );
   }
   if (lastError) {

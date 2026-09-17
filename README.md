@@ -27,7 +27,7 @@ Until the Raycast Store listing is live, install from source. You need macOS, [R
 git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm install && npx ray develop
 ```
 
-Once it has built you can stop it with Ctrl+C; Folio stays installed under Raycast's "Extension Development" section. To update later, `git pull` and run the same command again.
+Once it has built, **quit and reopen Raycast once** (`killall Raycast && open -a Raycast`). Raycast only routes OAuth sign-in callbacks to extensions that were present when it started, so a freshly imported development extension can't finish signing in until you relaunch. After that you can stop the dev server with Ctrl+C; Folio stays installed under Raycast's "Extension Development" section. To update later, `git pull`, run the same command again, and relaunch Raycast.
 
 You'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?personal=) with at least one brokerage connected. Folio's **Connect Brokerage** command can open the connection portal for you after you sign in.
 

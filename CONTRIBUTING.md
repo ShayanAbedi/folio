@@ -14,6 +14,11 @@ cd extension && npm install && npm run dev
 
 `npm run dev` imports the extension into Raycast and rebuilds on save. Turn on the **Use bundled fixture data** preference to work without a SnapTrade account.
 
+Two development-mode gotchas with OAuth, both Raycast behaviours rather than Folio bugs:
+
+- Raycast only delivers OAuth callbacks to extensions that were registered when it launched. After the first `npm run dev` on a machine (or after renaming the package), quit and reopen Raycast before testing sign-in, or the overlay will sit there after the browser returns.
+- A rebuild while a sign-in is open in the browser drops the pending request. Don't save files mid-flow.
+
 ```bash
 cd extension && npm test
 ```
