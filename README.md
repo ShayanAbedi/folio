@@ -2,7 +2,7 @@
 
 # Folio
 
-**Your portfolio in Raycast.** A keyboard-first, read-only view of every brokerage account you've connected through [SnapTrade](https://snaptrade.com): net worth, holdings, activities, and *Fog*, the cash you've left idle.
+**Your portfolio, one keystroke away.** A keyboard-first, read-only view of every brokerage account you've connected through [SnapTrade](https://snaptrade.com): net worth, holdings, activities, and *Fog*, the cash you've left idle.
 
 Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerage SnapTrade supports. MIT licensed. Read-only by design: Folio cannot place trades or move money.
 

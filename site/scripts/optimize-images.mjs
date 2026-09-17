@@ -109,7 +109,7 @@ async function openGraph() {
   <text x="472" y="288" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
         font-size="96" font-weight="700" fill="#F2F4F8" letter-spacing="-3">Folio</text>
   <text x="472" y="356" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
-        font-size="42" font-weight="500" fill="#BFD8EE" letter-spacing="-0.6">Your portfolio in Raycast.</text>
+        font-size="42" font-weight="500" fill="#BFD8EE" letter-spacing="-0.6">Your portfolio, one keystroke away.</text>
   <text x="472" y="424" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
         font-size="28" font-weight="400" fill="#8A92A6">Read-only. Open source. Powered by SnapTrade.</text>
   <rect x="0" y="626" width="${W}" height="4" fill="#163A6B"/>

@@ -19,7 +19,7 @@ export const INSTALL_COMMAND =
 /** Raycast only routes OAuth callbacks to extensions present at launch, so a fresh dev import needs one relaunch. */
 export const RELAUNCH_COMMAND = "killall Raycast; open -a Raycast";
 
-export const TAGLINE = "Your portfolio in Raycast.";
+export const TAGLINE = "Your portfolio, one keystroke away.";
 
 export const ONE_LINER =
   "A keyboard-first, read-only view of every brokerage account you've connected through SnapTrade: net worth, holdings, activities, and Fog, the cash you've left idle.";
