@@ -56,7 +56,7 @@ Fog is cash that isn't doing anything. The amount is your cash balance across ac
 
 - **Read-only.** SnapTrade OAuth sessions can't trade. Folio only ever reads accounts, balances, positions and activities.
 - **Your data goes straight from Raycast to SnapTrade.** Nothing about your portfolio passes through any other server.
-- **Tokens stay on your Mac**, stored by Raycast's encrypted OAuth store. Signing out revokes them at SnapTrade and deletes them locally.
+- **Tokens stay on your Mac**, stored by Raycast's encrypted OAuth store. Signing out revokes them at SnapTrade and deletes them locally, and tells you if the revoke didn't go through.
 - **The one piece of server code** is a small, open-source Cloudflare Worker in [`auth-worker/`](auth-worker/) that turns your one-time sign-in code into tokens. It holds no user data and keeps no logs of tokens. Its threat model is written up in [SECURITY.md](SECURITY.md).
 - **Demo mode** (the "Use bundled fixture data" preference) renders invented sample accounts without any network access, if you want to try Folio before signing in.
 

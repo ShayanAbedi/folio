@@ -15,7 +15,7 @@ Open a private security advisory on GitHub (Security → Report a vulnerability)
 | Item | Location | Notes |
 | --- | --- | --- |
 | OAuth `client_secret` | Cloudflare Worker secret | Never in the extension, never in git. Rotatable in the SnapTrade dashboard + `wrangler secret put`. |
-| Access / refresh tokens | Raycast's OAuth token store on your Mac | Written with `OAuth.PKCEClient.setTokens`. Deleted on sign-out after a revoke call. |
+| Access / refresh tokens | Raycast's OAuth token store on your Mac | Written with `OAuth.PKCEClient.setTokens`. Sign-out revokes at SnapTrade (one retry), then deletes them locally either way; the UI says if the revoke failed. |
 | Privacy-mode flag | Raycast LocalStorage | A boolean. |
 | Cached API responses | Raycast Cache on your Mac | 60–120 s TTL for fast reopening. Cleared on sign-out and on Refresh. |
 | Dev-only Personal API key | Raycast password preference | Off by default. Only for developers running against their own SnapTrade account. |

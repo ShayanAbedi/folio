@@ -17,7 +17,8 @@ import {
 } from "./content";
 
 /** Feature shots sit in the wider grid column: ~650px once the layout stops growing. */
-const FEATURE_SIZES = "(min-width: 1180px) 648px, (min-width: 900px) 55vw, 90vw";
+const FEATURE_SIZES =
+  "(min-width: 1180px) 648px, (min-width: 900px) 55vw, 90vw";
 
 export default function Page() {
   return (
@@ -41,9 +42,10 @@ export default function Page() {
           <p className="hero__name">Folio</p>
           <h1>{TAGLINE}</h1>
           <p className="hero__liner">
-            A keyboard-first, read-only view of every brokerage account you&rsquo;ve connected
-            through <a href={SNAPTRADE}>SnapTrade</a>: net worth, holdings, activities, and{" "}
-            <em>Fog</em>, the cash you&rsquo;ve left idle.
+            A keyboard-first, read-only view of every brokerage account
+            you&rsquo;ve connected through <a href={SNAPTRADE}>SnapTrade</a>:
+            net worth, holdings, activities, and <em>Fog</em>, the cash
+            you&rsquo;ve left idle.
           </p>
 
           <div className="hero__actions">
@@ -63,8 +65,8 @@ export default function Page() {
           </div>
 
           <p className="hero__note">
-            Free and open source, MIT licensed. Read-only by design: Folio cannot place trades or
-            move money.
+            Free and open source, MIT licensed. Read-only by design: Folio
+            cannot place trades or move money.
           </p>
 
           <div className="hero__shot">
@@ -86,14 +88,17 @@ export default function Page() {
               <div className="feature__text">
                 <h2>Net worth at a glance</h2>
                 <p>
-                  Every connected account, grouped by the institution it lives at, with totals per
-                  currency at the top. Where your brokerage reports it, the day&rsquo;s change sits
-                  on the line.
+                  Every connected account, grouped by the institution it lives
+                  at, with totals per currency at the top. Where your brokerage
+                  reports it, the day&rsquo;s change sits on the line.
                 </p>
                 <ul className="feature__meta">
                   <li>Grouped by institution</li>
                   <li>Per-currency totals</li>
-                  <li>Day change when available</li>
+                  <li>
+                    Day change when SnapTrade has balance history for every
+                    account
+                  </li>
                 </ul>
               </div>
               <div className="feature__media">
@@ -110,8 +115,9 @@ export default function Page() {
               <div className="feature__text">
                 <h2>Every position, searchable</h2>
                 <p>
-                  Type a ticker anywhere and land on the holding. The detail panel carries weight,
-                  open P&amp;L, average cost and exchange, across every account at once.
+                  Type a ticker anywhere and land on the holding. The detail
+                  panel carries weight, open P&amp;L, average cost and exchange,
+                  across every account at once.
                 </p>
                 <ul className="feature__meta">
                   <li>Weight</li>
@@ -134,8 +140,9 @@ export default function Page() {
               <div className="feature__text">
                 <h2>Trades, dividends, deposits</h2>
                 <p>
-                  A year of activity across every account, newest first and grouped by month.
-                  Narrow it to trades, dividends or deposits, or search the whole list.
+                  A year of activity across every account, newest first and
+                  grouped by month. Narrow it to trades, dividends or deposits,
+                  or search the whole list.
                 </p>
                 <ul className="feature__meta">
                   <li>All · Trades · Dividends · Deposits</li>
@@ -157,9 +164,9 @@ export default function Page() {
               <div className="feature__text">
                 <h2>Fog: cash you forgot</h2>
                 <p>
-                  How much cash is sitting undeployed, and for how long. Counted from your last buy
-                  or deposit, whichever came later, so the number understates on purpose rather than
-                  guessing.
+                  How much cash is sitting undeployed, and for how long. Counted
+                  from your last buy or deposit, whichever came later, so the
+                  number understates on purpose rather than guessing.
                 </p>
                 <ul className="feature__meta">
                   <li>Idle days</li>
@@ -185,21 +192,31 @@ export default function Page() {
               <div>
                 <h2 id="menubar-heading">And in the menu bar</h2>
                 <p>
-                  Net worth sits in the macOS menu bar, with per-account totals and Fog one click
-                  away. <kbd>⌘⇧P</kbd> hides every balance, everywhere Folio shows one, menu bar
-                  included.
+                  Net worth sits in the macOS menu bar, with per-account totals
+                  and Fog one click away. <kbd>⌘⇧P</kbd> hides every balance,
+                  everywhere Folio shows one, menu bar included.
                 </p>
               </div>
               <div className="menubar" aria-hidden="true">
                 <div className="menubar__strip">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset("/folio-icon-128.webp")} alt="" width={128} height={128} />
+                  <img
+                    src={asset("/folio-icon-128.webp")}
+                    alt=""
+                    width={128}
+                    height={128}
+                  />
                   <span className="num">$167,648.17</span>
                   <span className="menubar__label">Normal</span>
                 </div>
                 <div className="menubar__strip">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={asset("/folio-icon-128.webp")} alt="" width={128} height={128} />
+                  <img
+                    src={asset("/folio-icon-128.webp")}
+                    alt=""
+                    width={128}
+                    height={128}
+                  />
                   <span className="menubar__dots">••••••••</span>
                   <span className="menubar__label">Privacy mode</span>
                 </div>
@@ -218,22 +235,25 @@ export default function Page() {
               <li>
                 <h3>Sign In with SnapTrade</h3>
                 <p>
-                  Your browser opens SnapTrade&rsquo;s consent page. Approve read-only access and
-                  Raycast picks it up from there. Nothing to paste.
+                  Your browser opens SnapTrade&rsquo;s consent page. Approve
+                  read-only access and Raycast picks it up from there. Nothing
+                  to paste.
                 </p>
               </li>
               <li>
                 <h3>Connect a brokerage</h3>
                 <p>
-                  Connect Brokerage opens SnapTrade&rsquo;s portal: Wealthsimple, Questrade,
-                  Interactive Brokers, or any other brokerage SnapTrade supports.
+                  Connect Brokerage opens SnapTrade&rsquo;s portal:
+                  Wealthsimple, Questrade, Interactive Brokers, or any other
+                  brokerage SnapTrade supports.
                 </p>
               </li>
               <li>
                 <h3>Show Portfolio</h3>
                 <p>
-                  That is the whole setup. <kbd>⌘R</kbd> refreshes, <kbd>⌘I</kbd> toggles position
-                  details, <kbd>⌘⇧P</kbd> hides balances.
+                  That is the whole setup. <kbd>⌘R</kbd> refreshes,{" "}
+                  <kbd>⌘I</kbd> toggles position details, <kbd>⌘⇧P</kbd> hides
+                  balances.
                 </p>
               </li>
             </ol>
@@ -256,22 +276,24 @@ export default function Page() {
             <ul className="facts">
               <li>
                 <b>Read-only scopes</b>
-                Folio requests <code>read</code>, <code>openid</code> and <code>email</code>.
-                SnapTrade OAuth apps cannot place, modify or cancel trades, and cannot move money.
+                Folio requests <code>read</code>, <code>openid</code> and{" "}
+                <code>email</code>. SnapTrade OAuth apps cannot place, modify or
+                cancel trades, and cannot move money.
               </li>
               <li>
                 <b>Your data does not pass through us</b>
-                Accounts, balances, positions and activities go directly from your Mac to{" "}
-                <code>api.snaptrade.com</code>. No third-party server sees them.
+                Accounts, balances, positions and activities go directly from
+                your Mac to <code>api.snaptrade.com</code>. No third-party
+                server sees them.
               </li>
               <li>
                 <b>Tokens stay on your Mac</b>
-                They live in Raycast&rsquo;s encrypted OAuth store. Signing out revokes them at
-                SnapTrade and deletes them locally.
+                They live in Raycast&rsquo;s encrypted OAuth store. Signing out
+                revokes them at SnapTrade and deletes them locally, and tells
+                you if the revoke didn&rsquo;t go through.
               </li>
               <li>
-                <b>One small server component</b>
-                A stateless, open-source{" "}
+                <b>One small server component</b>A stateless, open-source{" "}
                 <a href={AUTH_WORKER} rel="noreferrer">
                   Cloudflare Worker
                 </a>{" "}
@@ -279,8 +301,9 @@ export default function Page() {
               </li>
               <li>
                 <b>No analytics, no telemetry</b>
-                The extension makes no network calls beyond SnapTrade and that worker. This page
-                sets no cookies and loads no third-party scripts.
+                The extension makes no network calls beyond SnapTrade and that
+                worker. This page sets no cookies and loads no third-party
+                scripts.
               </li>
             </ul>
             <p className="facts__footnote">
@@ -294,17 +317,24 @@ export default function Page() {
 
           <hr className="rule" />
 
-          <section className="block" id="install" aria-labelledby="install-heading">
+          <section
+            className="block"
+            id="install"
+            aria-labelledby="install-heading"
+          >
             <div className="section-head">
               <p className="eyebrow">Install</p>
-              <h2 id="install-heading">Two commands, until the Store listing is live</h2>
+              <h2 id="install-heading">
+                Two commands, until the Store listing is live
+              </h2>
               <p>
-                The Raycast Store listing is in review. Until it clears, Folio installs from source.
+                The Raycast Store listing is in review. Until it clears, Folio
+                installs from source.
               </p>
             </div>
             <p className="install-step">
-              <strong>1.</strong> Clone, install and import into Raycast. Leave this running until it
-              says <em>built extension successfully</em>.
+              <strong>1.</strong> Clone, install and import into Raycast. Leave
+              this running until it says <em>built extension successfully</em>.
             </p>
             <div className="command">
               <div className="command__bar">
@@ -313,16 +343,20 @@ export default function Page() {
               </div>
               <pre>
                 <code>
-                  git clone https://github.com/ShayanAbedi/folio <span className="op">&amp;&amp;</span>{" "}
-                  cd folio/extension <span className="op">&amp;&amp;</span> npm install{" "}
+                  git clone https://github.com/ShayanAbedi/folio{" "}
+                  <span className="op">&amp;&amp;</span> cd folio/extension{" "}
+                  <span className="op">&amp;&amp;</span> npm install{" "}
                   <span className="op">&amp;&amp;</span> npx ray develop
                 </code>
               </pre>
             </div>
             <p className="install-step">
-              <strong>2. Then quit and reopen Raycast. This step is required.</strong> Raycast only
-              routes sign-in callbacks to extensions that were present when it started, so without a
-              relaunch the SnapTrade sign-in will open in your browser and never come back.
+              <strong>
+                2. Then quit and reopen Raycast. This step is required.
+              </strong>{" "}
+              Raycast only routes sign-in callbacks to extensions that were
+              present when it started, so without a relaunch the SnapTrade
+              sign-in will open in your browser and never come back.
             </p>
             <div className="command">
               <div className="command__bar">
@@ -336,9 +370,10 @@ export default function Page() {
               </pre>
             </div>
             <p className="requirements">
-              Requires macOS, <a href={RAYCAST}>Raycast</a> and Node 20+. After the relaunch you can
-              stop the dev server with Ctrl+C; Folio stays installed under Raycast&rsquo;s Extension
-              Development section. To update, <code>git pull</code>, run step 1 again, then step 2.
+              Requires macOS, <a href={RAYCAST}>Raycast</a> and Node 20+. After
+              the relaunch you can stop the dev server with Ctrl+C; Folio stays
+              installed under Raycast&rsquo;s Extension Development section. To
+              update, <code>git pull</code>, run step 1 again, then step 2.
             </p>
           </section>
         </div>
@@ -358,8 +393,8 @@ export default function Page() {
             </a>
           </div>
           <p className="foot__legal">
-            Not affiliated with any brokerage. SnapTrade is a trademark of its owner. Folio is MIT
-            licensed.
+            Not affiliated with any brokerage. SnapTrade is a trademark of its
+            owner. Folio is MIT licensed.
           </p>
         </div>
       </footer>
