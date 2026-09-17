@@ -216,7 +216,7 @@ export default function Page() {
             </div>
             <ol className="steps">
               <li>
-                <h3>Sign in with SnapTrade</h3>
+                <h3>Sign In with SnapTrade</h3>
                 <p>
                   Your browser opens SnapTrade&rsquo;s consent page. Approve read-only access and
                   Raycast picks it up from there. Nothing to paste.

@@ -33,7 +33,7 @@ You'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?pe
 
 ## Use
 
-1. Run **Sign in with SnapTrade**. Your browser opens SnapTrade's consent page; approve read-only access and Raycast picks it up from there. Nothing to paste.
+1. Run **Sign In with SnapTrade**. Your browser opens SnapTrade's consent page; approve read-only access and Raycast picks it up from there. Nothing to paste.
 2. Run **Show Portfolio**.
 
 | Command | What it shows |
@@ -44,7 +44,7 @@ You'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?pe
 | Show Fog | Idle cash: how much is sitting undeployed and for how long |
 | Connect Brokerage | Link another brokerage, or repair a disabled connection |
 | Menu Bar Portfolio | Net worth in the menu bar, with per-account totals and Fog |
-| Sign in with SnapTrade | Start or end your session |
+| Sign In with SnapTrade | Start or end your session |
 
 Everywhere: **⌘⇧P** hides every balance (privacy mode), **⌘R** refreshes, **⌘I** toggles position details.
 
