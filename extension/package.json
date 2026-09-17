@@ -119,8 +119,8 @@
       "description": "URL of the deployed Folio auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
       "type": "textfield",
       "required": false,
-      "default": "https://fathom-auth.shayanabedi-dev.workers.dev",
-      "placeholder": "https://fathom-auth.<your-subdomain>.workers.dev"
+      "default": "https://folio-auth.shayanabedi-dev.workers.dev",
+      "placeholder": "https://folio-auth.<your-subdomain>.workers.dev"
     },
     {
       "name": "oauthClientId",
