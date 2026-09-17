@@ -3,11 +3,13 @@ import type { Account, Activity, Balance, Position, UniversalSymbol } from "../l
 /** Fixture dates are relative to "now" so Fog and streaks stay meaningful in screenshots. */
 export const FIXTURE_NOW = new Date();
 
+/**
+ * Exactly N×24h before FIXTURE_NOW (plus a minute of slack), so "N days ago" floors to N regardless
+ * of the time of day or timezone the code runs in. `hour` is accepted for call-site readability only.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function daysAgo(days: number, hour = 14): string {
-  const d = new Date(FIXTURE_NOW);
-  d.setUTCDate(d.getUTCDate() - days);
-  d.setUTCHours(hour, 30, 0, 0);
-  return d.toISOString();
+  return new Date(FIXTURE_NOW.getTime() - days * 86_400_000 - 60_000).toISOString();
 }
 
 export function isoDateDaysAgo(days: number): string {
