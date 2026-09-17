@@ -7,6 +7,7 @@ import {
   AUTH_WORKER,
   GITHUB,
   INSTALL_COMMAND,
+  RELAUNCH_COMMAND,
   RAYCAST,
   RAYCAST_STORE,
   SECURITY_MD,
@@ -296,12 +297,15 @@ export default function Page() {
           <section className="block" id="install" aria-labelledby="install-heading">
             <div className="section-head">
               <p className="eyebrow">Install</p>
-              <h2 id="install-heading">One command, until the Store listing is live</h2>
+              <h2 id="install-heading">Two commands, until the Store listing is live</h2>
               <p>
-                The Raycast Store listing is in review. Until it clears, Folio installs from source
-                in a single command.
+                The Raycast Store listing is in review. Until it clears, Folio installs from source.
               </p>
             </div>
+            <p className="install-step">
+              <strong>1.</strong> Clone, install and import into Raycast. Leave this running until it
+              says <em>built extension successfully</em>.
+            </p>
             <div className="command">
               <div className="command__bar">
                 <span>Terminal</span>
@@ -315,10 +319,26 @@ export default function Page() {
                 </code>
               </pre>
             </div>
+            <p className="install-step">
+              <strong>2. Then quit and reopen Raycast. This step is required.</strong> Raycast only
+              routes sign-in callbacks to extensions that were present when it started, so without a
+              relaunch the SnapTrade sign-in will open in your browser and never come back.
+            </p>
+            <div className="command">
+              <div className="command__bar">
+                <span>Terminal</span>
+                <CopyButton value={RELAUNCH_COMMAND} />
+              </div>
+              <pre>
+                <code>
+                  killall Raycast<span className="op">;</span> open -a Raycast
+                </code>
+              </pre>
+            </div>
             <p className="requirements">
-              Requires macOS, <a href={RAYCAST}>Raycast</a> and Node 20+. Once it builds you can
-              stop it with Ctrl+C; Folio stays installed under Raycast&rsquo;s Extension Development
-              section. To update, <code>git pull</code> and run it again.
+              Requires macOS, <a href={RAYCAST}>Raycast</a> and Node 20+. After the relaunch you can
+              stop the dev server with Ctrl+C; Folio stays installed under Raycast&rsquo;s Extension
+              Development section. To update, <code>git pull</code>, run step 1 again, then step 2.
             </p>
           </section>
         </div>

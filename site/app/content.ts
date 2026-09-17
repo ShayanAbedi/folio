@@ -16,6 +16,9 @@ export const RAYCAST_STORE: string | null = null;
 export const INSTALL_COMMAND =
   "git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm install && npx ray develop";
 
+/** Raycast only routes OAuth callbacks to extensions present at launch, so a fresh dev import needs one relaunch. */
+export const RELAUNCH_COMMAND = "killall Raycast; open -a Raycast";
+
 export const TAGLINE = "Your portfolio in Raycast.";
 
 export const ONE_LINER =

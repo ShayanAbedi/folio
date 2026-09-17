@@ -927,3 +927,12 @@ footer {
     animation-duration: 0.01ms !important;
   }
 }
+
+.install-step {
+  margin: 1.5rem 0 0.75rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.install-step strong {
+  color: var(--fg, #f2f2f4);
+}
