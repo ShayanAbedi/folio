@@ -2,6 +2,8 @@ name = "folio-auth"
 main = "src/index.ts"
 compatibility_date = "2026-09-01"
 workers_dev = true
+# Only the production URL should exist; no per-version preview URLs.
+preview_urls = false
 
 # Secrets (never in this file, never in git):
 #   wrangler secret put SNAPTRADE_OAUTH_CLIENT_ID
@@ -15,8 +17,6 @@ ALLOWED_REDIRECT_URIS = "https://raycast.com/redirect?packageName=Extension,http
 # Optional: override the discovery document location (defaults to SnapTrade's).
 # SNAPTRADE_ISSUER = "https://api.snaptrade.com"
 
-# Disable per-version preview URLs; only the production URL should exist.
-preview_urls = false
 
 # Per-IP rate limit on the OAuth endpoints (Workers rate-limit binding, wrangler >= 4.36).
 # 30 requests per minute per client IP is far above what one Raycast user needs
