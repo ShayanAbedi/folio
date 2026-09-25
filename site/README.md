@@ -35,6 +35,17 @@ and writes the result to custom properties; the hero's own CSS carries centred f
 so the page is unchanged with JavaScript off. The hero entrance and the scroll-driven
 reveals are pure CSS, the reveals behind `@supports (animation-timeline: view())`.
 
+`components/HeroDemo.tsx` puts the hero shot in motion: Folio redrawn in HTML inside a
+Raycast window, run through four chapters (Portfolio, Positions, Activities, Fog). Each
+chapter summons Raycast, types the command, and pushes the camera in. The script is a
+pure function of a loop clock in `components/hero-demo/timeline.ts`; the numbers in
+`components/hero-demo/data.ts` are the extension's bundled fixtures, the same ones the
+screenshots show, so update them together. The server still renders the static
+screenshot. The demo mounts over it only when motion is welcome, fades in from a
+resting frame that matches it, and runs only while it is on screen and the tab is
+visible. The Pause button and chapter links are there because it runs past five
+seconds.
+
 Every one of these lives inside `@media (prefers-reduced-motion: no-preference)`, and
 nothing depends on an animation to become visible — with reduced motion on, or in a
 browser without scroll-driven animations, the page renders complete and static.

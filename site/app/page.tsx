@@ -1,4 +1,5 @@
 import { CopyButton } from "@/components/CopyButton";
+import { HeroDemo } from "@/components/HeroDemo";
 import { HeroGlow } from "@/components/HeroGlow";
 import { Shot } from "@/components/Shot";
 
@@ -70,13 +71,15 @@ export default function Page() {
           </p>
 
           <div className="hero__shot">
-            <Shot
-              name="portfolio"
-              priority
-              tightBelow="760px"
-              sizes="(min-width: 1260px) 1084px, 90vw"
-              alt="The Show Portfolio command in Raycast: net worth of $167,648.17 CAD across 4 accounts and $94,118.77 USD, with accounts listed under Wealthsimple, Questrade and Interactive Brokers, each showing cash, day change and total value."
-            />
+            <HeroDemo>
+              <Shot
+                name="portfolio"
+                priority
+                tightBelow="760px"
+                sizes="(min-width: 1260px) 1084px, 90vw"
+                alt="The Show Portfolio command in Raycast: net worth of $167,648.17 CAD across 4 accounts and $94,118.77 USD, with accounts listed under Wealthsimple, Questrade and Interactive Brokers, each showing cash, day change and total value."
+              />
+            </HeroDemo>
           </div>
         </div>
       </header>
