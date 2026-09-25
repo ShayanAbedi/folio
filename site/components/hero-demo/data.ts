@@ -231,6 +231,64 @@ export const ACTIVITIES: Record<"all" | "dividends", ActivitySection[]> = {
 
 export const FILTERS = ["All", "Trades", "Dividends", "Deposits"] as const;
 
+/**
+ * Menu Bar Portfolio (extension/src/menu-bar-portfolio.tsx). The title is the primary
+ * currency's net worth and day change, both in compact notation.
+ */
+export const MENU_BAR_TITLE = "$167.6K · ▲ $570.8";
+export const MENU_BAR_CLOCK = "Wed Sep 16  9:41 AM";
+
+export type MenuIcon = "up" | "cloud" | "pie" | "list" | "receipt" | "eye-off" | "refresh" | "gear";
+
+export type MenuEntry =
+  | { kind: "header"; text: string }
+  | { kind: "separator" }
+  | { kind: "item"; id: string; icon?: MenuIcon; title: string; subtitle?: string; shortcut?: string };
+
+export const MENU: MenuEntry[] = [
+  { kind: "header", text: "Net Worth" },
+  { kind: "item", id: "cad", icon: "up", title: "$167,648.17 CAD", subtitle: "▲ $570.75 vs previous snapshot" },
+  { kind: "item", id: "usd", icon: "up", title: "$94,118.77 USD", subtitle: "▲ $1,204.33 vs previous snapshot" },
+  { kind: "separator" },
+  { kind: "header", text: "Wealthsimple" },
+  { kind: "item", id: "tfsa", title: "TFSA", subtitle: "$68,432.15 CAD" },
+  { kind: "item", id: "rrsp", title: "RRSP", subtitle: "$41,905.60 CAD" },
+  { kind: "separator" },
+  { kind: "header", text: "Questrade" },
+  { kind: "item", id: "margin", title: "Margin", subtitle: "$57,310.42 CAD" },
+  { kind: "separator" },
+  { kind: "header", text: "Interactive Brokers" },
+  { kind: "item", id: "individual", title: "Individual", subtitle: "$94,118.77 USD" },
+  { kind: "separator" },
+  { kind: "header", text: "Fog" },
+  { kind: "item", id: "fog", icon: "cloud", title: "4 days idle", subtitle: "$25,022.27 USD undeployed" },
+  { kind: "separator" },
+  { kind: "item", id: "portfolio", icon: "pie", title: "Show Portfolio" },
+  { kind: "item", id: "positions", icon: "list", title: "Show Positions" },
+  { kind: "item", id: "activities", icon: "receipt", title: "Show Activities" },
+  { kind: "separator" },
+  { kind: "item", id: "hide", icon: "eye-off", title: "Hide Balances", shortcut: "⇧⌘P" },
+  { kind: "item", id: "refresh", icon: "refresh", title: "Refresh", shortcut: "⌘R" },
+  { kind: "item", id: "preferences", icon: "gear", title: "Preferences…" },
+];
+
+/** Menu geometry in stage px. The CSS draws the menu at these heights; the cursor script aims with them. */
+export const MENU_TOP = 30;
+const MENU_PADDING = 5;
+const ENTRY_HEIGHT = { header: 20, separator: 9, item: 22 } as const;
+
+/** Where each item sits vertically, so the script can tell which one the cursor is over. */
+export const MENU_ITEM_BOUNDS: { id: string; top: number; bottom: number }[] = (() => {
+  let y = MENU_TOP + MENU_PADDING;
+  const bounds: { id: string; top: number; bottom: number }[] = [];
+  for (const entry of MENU) {
+    const h = ENTRY_HEIGHT[entry.kind];
+    if (entry.kind === "item") bounds.push({ id: entry.id, top: y, bottom: y + h });
+    y += h;
+  }
+  return bounds;
+})();
+
 export const FOG = {
   headline: "4 days idle",
   primary: "$25,022.27 USD",

@@ -36,8 +36,9 @@ so the page is unchanged with JavaScript off. The hero entrance and the scroll-d
 reveals are pure CSS, the reveals behind `@supports (animation-timeline: view())`.
 
 `components/HeroDemo.tsx` puts the hero shot in motion: Folio redrawn in HTML inside a
-Raycast window, run through four chapters (Portfolio, Positions, Activities, Fog). Each
-chapter summons Raycast, types the command, and pushes the camera in. The script is a
+Raycast window, run through five chapters (Portfolio, Positions, Activities, Fog, Menu
+bar). Each Raycast chapter summons Raycast, types the command, and pushes the camera in;
+the last one clicks through the menu bar item and hides balances from its menu. The script is a
 pure function of a loop clock in `components/hero-demo/timeline.ts`; the numbers in
 `components/hero-demo/data.ts` are the extension's bundled fixtures, the same ones the
 screenshots show, so update them together. The server still renders the static

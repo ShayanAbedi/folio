@@ -1,13 +1,16 @@
+import { MENU_ITEM_BOUNDS } from "./data";
+
 /**
- * The hero demo's script: four chapters, one per command. Each chapter summons
+ * The hero demo's script: a chapter per command. Each Raycast chapter summons
  * Raycast, types the command into the root search, opens it, and then lets the
- * camera push in on the part worth reading.
+ * camera push in on the part worth reading; the last one clicks through the menu
+ * bar item instead.
  *
  * A frame is a pure function of the loop clock, so any moment can be drawn on its
  * own and seeking to a chapter is only a matter of setting the clock.
  */
 
-export const CHAPTERS = ["Portfolio", "Positions", "Activities", "Fog"] as const;
+export const CHAPTERS = ["Portfolio", "Positions", "Activities", "Fog", "Menu bar"] as const;
 export const CHAPTER_MS = 6500;
 export const LOOP_MS = CHAPTER_MS * CHAPTERS.length;
 
@@ -17,6 +20,18 @@ export type Keystroke = { keys: readonly string[]; label?: string };
 
 /** A push-in: transform origin as a percentage of the stage, and how far in. */
 export type Camera = { x: number; y: number; scale: number };
+
+export type MenuBarFrame = {
+  /** Whether the menu bar has slid in. */
+  shown: boolean;
+  open: boolean;
+  /** The menu item under the cursor, by id. */
+  hovered: string | null;
+  masked: boolean;
+};
+
+/** The pointer, in stage px. */
+export type CursorFrame = { x: number; y: number; visible: boolean; pressed: boolean };
 
 export type Frame = {
   chapter: number;
@@ -40,6 +55,8 @@ export type Frame = {
   keyVisible: boolean;
   /** The first beat after a press, when the overlay dips like a key going down. */
   keyFresh: boolean;
+  menuBar: MenuBarFrame | null;
+  cursor: CursorFrame | null;
 };
 
 type Timed = Keystroke & { at: number };
@@ -47,6 +64,8 @@ type Timed = Keystroke & { at: number };
 type Scene = Partial<Omit<Frame, "chapter" | "progress" | "open" | "key" | "keyVisible" | "keyFresh">> & {
   view: View;
   keys: Timed[];
+  /** False for a chapter that never opens the Raycast window. */
+  window?: boolean;
 };
 
 /** Every chapter opens the same way. */
@@ -60,6 +79,31 @@ const typed = (lt: number, text: string, from: number, perChar: number) =>
   lt < from ? "" : text.slice(0, Math.floor((lt - from) / perChar) + 1);
 
 const during = (lt: number, from: number, to: number) => lt >= from && lt < to;
+
+const ease = (k: number) => (k < 0.5 ? 4 * k * k * k : 1 - (-2 * k + 2) ** 3 / 2);
+
+type Point = { x: number; y: number };
+type Move = Point & { from: number; to: number };
+
+/** Where the pointer is at `lt`, gliding from `start` through each move in turn. */
+function pointer(lt: number, start: Point, moves: Move[]): Point {
+  let at = start;
+  for (const m of moves) {
+    if (lt >= m.to) {
+      at = m;
+      continue;
+    }
+    if (lt <= m.from) break;
+    const k = ease((lt - m.from) / (m.to - m.from));
+    return { x: at.x + (m.x - at.x) * k, y: at.y + (m.y - at.y) * k };
+  }
+  return { x: at.x, y: at.y };
+}
+
+const middleOf = (id: string) => {
+  const b = MENU_ITEM_BOUNDS.find((x) => x.id === id);
+  return b ? (b.top + b.bottom) / 2 : 0;
+};
 
 function scene(chapter: number, lt: number): Scene {
   switch (chapter) {
@@ -124,13 +168,50 @@ function scene(chapter: number, lt: number): Scene {
       };
     }
 
-    default: {
+    case 3: {
       const opened = lt >= 1400;
       return {
         view: opened ? "fog" : "root",
         query: opened ? "" : typed(lt, "fog", 800, 110),
         keys: [SUMMON, { at: 1250, keys: ["↵"], label: "Show Fog" }],
         camera: during(lt, 1750, 5300) ? { x: 30, y: 34, scale: 1.38 } : null,
+      };
+    }
+
+    // No Raycast window: click the menu bar item, sweep down to Fog, then Hide Balances.
+    default: {
+      const cursor = pointer(lt, { x: 560, y: 380 }, [
+        { from: 450, to: 1150, x: 700, y: 13 },
+        { from: 2100, to: 2800, x: 712, y: middleOf("fog") },
+        { from: 3050, to: 3550, x: 712, y: middleOf("hide") },
+        { from: 3850, to: 4450, x: 520, y: 470 },
+      ]);
+      const open = during(lt, 1300, 3760);
+      return {
+        view: "root",
+        window: false,
+        keys: [
+          { at: 1250, keys: ["Click"], label: "Folio in the menu bar" },
+          { at: 3700, keys: ["Click"], label: "Hide Balances" },
+        ],
+        menuBar: {
+          shown: during(lt, 100, 6150),
+          open,
+          hovered: open ? (MENU_ITEM_BOUNDS.find((b) => cursor.y >= b.top && cursor.y < b.bottom)?.id ?? null) : null,
+          masked: lt >= 3760,
+        },
+        cursor: {
+          ...cursor,
+          visible: during(lt, 300, 6000),
+          pressed: during(lt, 1250, 1370) || during(lt, 3700, 3820),
+        },
+        // Pinned to the top edge throughout, so a phone's tighter crop never loses the menu bar,
+        // and to the right edge while in close, where the extras and the menu live.
+        camera: during(lt, 500, 3950)
+          ? { x: 100, y: 0, scale: 1.26 }
+          : during(lt, 4000, 5800)
+            ? { x: 100, y: 0, scale: 2 }
+            : { x: 50, y: 0, scale: 1 },
       };
     }
   }
@@ -149,7 +230,7 @@ export function frameAt(t: number): Frame {
   return {
     chapter,
     progress: Math.min(1, Math.max(0, lt / CHAPTER_MS)),
-    open: during(lt, WINDOW_IN, WINDOW_OUT),
+    open: (s.window ?? true) && during(lt, WINDOW_IN, WINDOW_OUT),
     view: s.view,
     query: s.query ?? "",
     arg: s.arg ?? "",
@@ -162,6 +243,8 @@ export function frameAt(t: number): Frame {
     key: key && { keys: key.keys, label: key.label },
     keyVisible: age < KEY_HOLD,
     keyFresh: age < KEY_PRESS,
+    menuBar: s.menuBar ?? null,
+    cursor: s.cursor ?? null,
   };
 }
 
@@ -186,4 +269,6 @@ export const POSTER: Frame = {
   key: null,
   keyVisible: false,
   keyFresh: false,
+  menuBar: null,
+  cursor: null,
 };

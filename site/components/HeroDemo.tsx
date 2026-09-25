@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 
 import * as Icon from "./hero-demo/icons";
+import { Cursor, MenuBar } from "./hero-demo/MenuBar";
 import { RaycastWindow } from "./hero-demo/RaycastWindow";
 import { CHAPTER_MS, CHAPTERS, frameAt, LOOP_MS, POSTER, type Frame } from "./hero-demo/timeline";
 
@@ -15,7 +16,7 @@ const LEAD_IN_MS = 300;
 const TICK_MS = 50;
 
 /**
- * The hero shot, in motion: Folio in Raycast, command by command.
+ * The hero shot, in motion: Folio in Raycast, command by command, then in the menu bar.
  *
  * `children` is the static screenshot. It is what the server renders, what the page
  * paints first, and all that anyone with reduced motion or without JavaScript sees;
@@ -143,6 +144,8 @@ function Stage({ frame }: { frame: Frame }) {
         <div className="demo__camera" style={cameraStyle}>
           <div className="demo__wallpaper" />
           <RaycastWindow frame={frame} />
+          {frame.menuBar && <MenuBar state={frame.menuBar} />}
+          {frame.cursor && <Cursor state={frame.cursor} />}
         </div>
       </div>
 
