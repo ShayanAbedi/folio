@@ -58,9 +58,9 @@ cd auth-worker && npm install && npm test
 
 For local work, copy `auth-worker/.dev.vars.example` to `.dev.vars` (gitignored), fill it in, run `npm run dev`, and set the extension's *Auth Worker URL* preference to `http://localhost:8787`.
 
-## Developer-only preferences
+## Development-only UI
 
-Two preferences exist for development and are off by default: the fixture toggle, and a **Personal API key** mode that signs requests with a SnapTrade `clientId` + `consumerKey` instead of OAuth. Neither is meant for Store users.
+The **Use bundled fixture data** preference (off by default) renders sample accounts without a SnapTrade account. In development builds (`environment.isDevelopment`) the sign-in screen additionally shows the auth worker URL, client ID and redirect URI, plus *Copy Redirect URI* and *Open SnapTrade Dashboard* actions for registering an OAuth app. Store builds hide all of that.
 
 ## Rules of the road
 
