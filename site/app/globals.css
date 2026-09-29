@@ -1593,81 +1593,18 @@ kbd {
 
 /* ---------- install ---------- */
 
-.command {
-  position: relative;
-  margin: clamp(2rem, 4vw, 2.75rem) 0 0;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--bg-soft);
-}
 
-.command__bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.6rem 0.6rem 0.6rem 1rem;
-  border-bottom: 1px solid var(--line);
-  color: var(--text-faint);
-  font-size: 0.8125rem;
-  letter-spacing: 0.04em;
-}
 
-.command pre {
-  margin: 0;
-  padding: 1.15rem 1.25rem;
-  overflow-x: auto;
-  color: var(--text);
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  line-height: 1.85;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
 
-.command pre .op {
-  color: var(--blue-soft);
-}
 
-.copy {
-  min-height: 34px;
-  padding: 0.3rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(191, 216, 238, 0.05);
-  color: var(--text);
-  font: inherit;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.16s ease,
-    color 0.16s ease;
-}
 
-.copy:hover {
-  background: rgba(191, 216, 238, 0.11);
-}
 
-.copy[data-copied="true"] {
-  color: var(--blue-light);
-}
 
 .install-store {
   margin-top: clamp(2rem, 4vw, 2.75rem);
 }
 
-.install-source {
-  margin-top: clamp(3rem, 6vw, 4rem);
-  font-size: 1.1875rem;
-  font-weight: 600;
-}
 
-.requirements {
-  margin-top: 1.25rem;
-  color: var(--text-faint);
-  font-size: 0.9375rem;
-}
 
 /* ---------- footer ---------- */
 
@@ -1779,8 +1716,7 @@ footer {
     .section-head,
     .steps li,
     .facts li,
-    .command,
-    .requirements {
+    .install-store {
       animation: fade-up linear both;
       animation-timeline: view();
       animation-range: entry 6% entry 58%;
@@ -1815,11 +1751,3 @@ footer {
   }
 }
 
-.install-step {
-  margin: 1.5rem 0 0.75rem;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-.install-step strong {
-  color: var(--fg, #f2f2f4);
-}

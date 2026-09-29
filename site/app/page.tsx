@@ -1,4 +1,3 @@
-import { CopyButton } from "@/components/CopyButton";
 import { HeroDemo } from "@/components/HeroDemo";
 import { HeroGlow } from "@/components/HeroGlow";
 import { Shot } from "@/components/Shot";
@@ -7,9 +6,6 @@ import {
   asset,
   AUTH_WORKER,
   GITHUB,
-  INSTALL_COMMAND,
-  RELAUNCH_COMMAND,
-  RAYCAST,
   RAYCAST_STORE,
   SECURITY_MD,
   SNAPTRADE,
@@ -339,51 +335,6 @@ export default function Page() {
                 Install from Raycast Store
               </a>
             </div>
-
-            <h3 className="install-source">Or build from source</h3>
-            <p className="install-step">
-              <strong>1.</strong> Clone, install and import into Raycast. Leave
-              this running until it says <em>built extension successfully</em>.
-            </p>
-            <div className="command">
-              <div className="command__bar">
-                <span>Terminal</span>
-                <CopyButton value={INSTALL_COMMAND} />
-              </div>
-              <pre>
-                <code>
-                  git clone https://github.com/ShayanAbedi/folio{" "}
-                  <span className="op">&amp;&amp;</span> cd folio/extension{" "}
-                  <span className="op">&amp;&amp;</span> npm install{" "}
-                  <span className="op">&amp;&amp;</span> npx ray develop
-                </code>
-              </pre>
-            </div>
-            <p className="install-step">
-              <strong>
-                2. Then quit and reopen Raycast. This step is required.
-              </strong>{" "}
-              Raycast only routes sign-in callbacks to extensions that were
-              present when it started, so without a relaunch the SnapTrade
-              sign-in will open in your browser and never come back.
-            </p>
-            <div className="command">
-              <div className="command__bar">
-                <span>Terminal</span>
-                <CopyButton value={RELAUNCH_COMMAND} />
-              </div>
-              <pre>
-                <code>
-                  killall Raycast<span className="op">;</span> open -a Raycast
-                </code>
-              </pre>
-            </div>
-            <p className="requirements">
-              Requires macOS, <a href={RAYCAST}>Raycast</a> and Node 20+. After
-              the relaunch you can stop the dev server with Ctrl+C; Folio stays
-              installed under Raycast&rsquo;s Extension Development section. To
-              update, <code>git pull</code>, run step 1 again, then step 2.
-            </p>
           </section>
         </div>
       </main>

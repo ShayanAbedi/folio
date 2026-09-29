@@ -4,15 +4,8 @@ export const GITHUB = "https://github.com/ShayanAbedi/folio";
 export const SECURITY_MD = `${GITHUB}/blob/main/SECURITY.md`;
 export const AUTH_WORKER = `${GITHUB}/tree/main/auth-worker`;
 export const SNAPTRADE_SIGNUP = "https://dashboard.snaptrade.com/signup?personal=";
-export const RAYCAST = "https://raycast.com";
 export const SNAPTRADE = "https://snaptrade.com";
 export const RAYCAST_STORE = "https://www.raycast.com/shayan_abedi/folio";
-
-export const INSTALL_COMMAND =
-  "git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm install && npx ray develop";
-
-/** Raycast only routes OAuth callbacks to extensions present at launch, so a fresh dev import needs one relaunch. */
-export const RELAUNCH_COMMAND = "killall Raycast; open -a Raycast";
 
 export const TAGLINE = "Your portfolio, one keystroke away.";
 
