@@ -296,11 +296,18 @@ export default function Page() {
                 you if the revoke didn&rsquo;t go through.
               </li>
               <li>
-                <b>One small server component</b>A stateless, open-source{" "}
+                <b>One small server component, run by the author</b>Sign-in goes
+                through a stateless, open-source{" "}
                 <a href={AUTH_WORKER} rel="noreferrer">
                   Cloudflare Worker
                 </a>{" "}
-                turns your one-time sign-in code into tokens. It stores nothing.
+                that turns your one-time code into tokens. It exists only
+                because SnapTrade OAuth apps need a client secret that
+                can&rsquo;t ship inside an extension. It sees the code and
+                tokens in transit, stores nothing, and never sees your
+                portfolio. If it ever went away, nothing is lost: you&rsquo;d
+                sign in again once a new address ships, and anyone can run their
+                own from the source.
               </li>
               <li>
                 <b>No analytics, no telemetry</b>
