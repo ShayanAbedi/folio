@@ -21,7 +21,11 @@ Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerag
 
 ## Install
 
-Until the Raycast Store listing is live, install from source. You need macOS, [Raycast](https://raycast.com) and Node 20+.
+**[Install Folio from the Raycast Store](https://www.raycast.com/shayan_abedi/folio).**
+
+### From source
+
+You need macOS, [Raycast](https://raycast.com) and Node 20+.
 
 ```bash
 git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm install && npx ray develop
@@ -29,7 +33,7 @@ git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm inst
 
 Once it has built, **quit and reopen Raycast once** (`killall Raycast && open -a Raycast`). Raycast only routes OAuth sign-in callbacks to extensions that were present when it started, so a freshly imported development extension can't finish signing in until you relaunch. After that you can stop the dev server with Ctrl+C; Folio stays installed under Raycast's "Extension Development" section. To update later, `git pull`, run the same command again, and relaunch Raycast.
 
-You'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?personal=) with at least one brokerage connected. Folio's **Connect Brokerage** command can open the connection portal for you after you sign in.
+Either way, you'll also need a [SnapTrade account](https://dashboard.snaptrade.com/signup?personal=) with at least one brokerage connected. Folio's **Connect Brokerage** command can open the connection portal for you after you sign in.
 
 ## Use
 

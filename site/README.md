@@ -89,8 +89,7 @@ Other hosts work the same way; only the header file differs. Cloudflare reads a
 `public/_headers` file, and an assets-only `wrangler.toml` deploying `out/` is in the
 git history at 34b887e if that route is ever wanted again.
 
-## When the Raycast Store listing clears review
+## Raycast Store link
 
-Set `RAYCAST_STORE` in [`app/content.ts`](app/content.ts) to the listing URL. The hero
-button becomes a real link and drops its "In review" pill on its own. The copy in the
-Install section still describes the source install, so revisit that paragraph too.
+The Store listing URL lives in `RAYCAST_STORE` in [`app/content.ts`](app/content.ts).
+The hero button, the Install section and the footer all link to it.

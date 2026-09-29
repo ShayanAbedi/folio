@@ -50,16 +50,9 @@ export default function Page() {
           </p>
 
           <div className="hero__actions">
-            {RAYCAST_STORE ? (
-              <a className="btn btn--primary" href={RAYCAST_STORE}>
-                Install from Raycast Store
-              </a>
-            ) : (
-              <a className="btn btn--primary" href="#install">
-                Install from Raycast Store
-                <span className="btn__pill">In review</span>
-              </a>
-            )}
+            <a className="btn btn--primary" href={RAYCAST_STORE} rel="noreferrer">
+              Install from Raycast Store
+            </a>
             <a className="btn btn--ghost" href={GITHUB} rel="noreferrer">
               View on GitHub
             </a>
@@ -334,14 +327,20 @@ export default function Page() {
           >
             <div className="section-head">
               <p className="eyebrow">Install</p>
-              <h2 id="install-heading">
-                Two commands, until the Store listing is live
-              </h2>
+              <h2 id="install-heading">Get it from the Raycast Store</h2>
               <p>
-                The Raycast Store listing is in review. Until it clears, Folio
-                installs from source.
+                Install Folio from its Store listing, then run{" "}
+                <em>Sign In with SnapTrade</em>. Updates arrive through Raycast
+                on their own.
               </p>
             </div>
+            <div className="install-store">
+              <a className="btn btn--primary" href={RAYCAST_STORE} rel="noreferrer">
+                Install from Raycast Store
+              </a>
+            </div>
+
+            <h3 className="install-source">Or build from source</h3>
             <p className="install-step">
               <strong>1.</strong> Clone, install and import into Raycast. Leave
               this running until it says <em>built extension successfully</em>.
@@ -392,6 +391,9 @@ export default function Page() {
       <footer>
         <div className="wrap foot">
           <div className="foot__links">
+            <a href={RAYCAST_STORE} rel="noreferrer">
+              Raycast Store
+            </a>
             <a href={GITHUB} rel="noreferrer">
               GitHub
             </a>

@@ -384,16 +384,6 @@ section {
   border-color: rgba(191, 216, 238, 0.28);
 }
 
-.btn__pill {
-  margin-left: 0.1rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-  background: rgba(12, 17, 24, 0.14);
-  font-size: 0.75rem;
-  font-weight: 600;
-  letter-spacing: 0;
-}
-
 /* ---------- screenshots ---------- */
 
 /*
@@ -1661,6 +1651,16 @@ kbd {
 
 .copy[data-copied="true"] {
   color: var(--blue-light);
+}
+
+.install-store {
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+}
+
+.install-source {
+  margin-top: clamp(3rem, 6vw, 4rem);
+  font-size: 1.1875rem;
+  font-weight: 600;
 }
 
 .requirements {

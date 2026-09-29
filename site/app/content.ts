@@ -6,12 +6,7 @@ export const AUTH_WORKER = `${GITHUB}/tree/main/auth-worker`;
 export const SNAPTRADE_SIGNUP = "https://dashboard.snaptrade.com/signup?personal=";
 export const RAYCAST = "https://raycast.com";
 export const SNAPTRADE = "https://snaptrade.com";
-
-/**
- * The Store listing is still in review. Set this to the listing URL once it is
- * live and the hero button becomes a real link on its own.
- */
-export const RAYCAST_STORE: string | null = null;
+export const RAYCAST_STORE = "https://www.raycast.com/shayan_abedi/folio";
 
 export const INSTALL_COMMAND =
   "git clone https://github.com/ShayanAbedi/folio && cd folio/extension && npm install && npx ray develop";
