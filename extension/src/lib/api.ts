@@ -13,7 +13,7 @@ import { rateLimitMessage } from "./rate-limit";
 import { fetchText, RequestTimeout } from "./timed-fetch";
 
 /** Identifies Folio in SnapTrade's request logs. */
-const USER_AGENT = "Folio (Raycast extension; +https://github.com/ShayanAbedi/folio)";
+const USER_AGENT = "Folio";
 
 /**
  * Per attempt. A brokerage that never answers would otherwise hold the Menu Bar in "loading" for
