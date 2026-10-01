@@ -21,7 +21,7 @@ Works with Wealthsimple, Questrade, Interactive Brokers and every other brokerag
 
 ## Install
 
-**[Install Folio from the Raycast Store](https://www.raycast.com/shayan_abedi/folio).**
+<a href="https://www.raycast.com/shayan_abedi/folio" title="Install Folio Raycast Extension"><img src="https://www.raycast.com/shayan_abedi/folio/install_button@2x.png?v=1.1" height="64" style="height: 64px;" alt="Install Folio from the Raycast Store" /></a>
 
 ### From source
 
