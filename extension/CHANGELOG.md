@@ -1,6 +1,15 @@
 # Folio Changelog
 
-## [Initial Version] - {PR_MERGE_DATE}
+## [Reliability Fixes] - {PR_MERGE_DATE}
+
+- Fixed being signed out for no reason when two Folio commands refreshed the SnapTrade session at the same moment (for example the Menu Bar in the background and a command you opened)
+- The session now refreshes a few minutes before it expires, so requests don't straddle the expiry
+- An account whose holdings fail to refresh keeps its last loaded holdings, marked with the time they're from, instead of disappearing from the Menu Bar and its net worth
+- The Menu Bar lists accounts that couldn't be loaded at all, instead of leaving them out silently
+- "Updated" time in the Menu Bar and Show Portfolio, and a note when a refresh failed and older data is shown
+- At most two balance and position requests at a time per brokerage connection, so brokerages are less likely to rate-limit Folio
+
+## [Initial Version] - 2026-09-29
 
 - Sign In with SnapTrade (OAuth, PKCE, read-only) with token refresh and revoke through the Folio auth worker
 - Show Portfolio: net worth per currency, accounts grouped by institution, holdings per account

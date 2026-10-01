@@ -7,7 +7,7 @@
 import { SNAPTRADE_API_BASE } from "./discovery";
 import { AuthError, getAccessToken } from "./auth";
 import { authMode } from "./preferences";
-import { cacheGet, cacheSet } from "./cache";
+import { cacheGetEntry, cacheSet } from "./cache";
 
 export class ApiError extends Error {
   constructor(
@@ -28,10 +28,13 @@ export interface RequestOptions {
   ttlMs?: number;
   /** Bypass the cache (Refresh action). */
   fresh?: boolean;
+  /** Filled in with when the returned data was fetched from SnapTrade (earlier than now on a cache hit). */
+  meta?: FetchMeta;
 }
 
-async function bearer(force = false): Promise<string> {
-  return getAccessToken({ force });
+export interface FetchMeta {
+  /** Epoch ms. */
+  fetchedAt?: number;
 }
 
 function buildUrl(path: string, query?: RequestOptions["query"]): string {
@@ -72,15 +75,19 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
   const ttl = opts.ttlMs ?? (method === "GET" ? undefined : 0);
   const cacheKey = `${authMode()}:${url}`;
   if (method === "GET" && ttl !== 0 && !opts.fresh) {
-    const hit = cacheGet<T>(cacheKey, ttl);
-    if (hit !== undefined) return hit;
+    const hit = cacheGetEntry<T>(cacheKey, ttl);
+    if (hit !== undefined) {
+      if (opts.meta) opts.meta.fetchedAt = hit.at;
+      return hit.value;
+    }
   }
 
-  let token = await bearer();
+  let token = await getAccessToken();
   let result = await once<T>(url, opts, token);
   if (result.status === 401) {
-    token = await bearer(true); // refresh once
-    result = await once<T>(url, opts, token); // retry once
+    // Refresh once, unless another request already replaced the rejected token; then retry once.
+    token = await getAccessToken({ force: true, rejected: token });
+    result = await once<T>(url, opts, token);
   }
   if (result.status === 401) {
     throw new AuthError("SnapTrade rejected the session. Sign in again.", "signed-out");
@@ -97,5 +104,6 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
     );
   }
   if (method === "GET" && ttl !== 0) cacheSet(cacheKey, result.data);
+  if (opts.meta) opts.meta.fetchedAt = Date.now();
   return result.data as T;
 }

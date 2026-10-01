@@ -190,6 +190,13 @@ export interface AccountSnapshot {
   holdings: AccountHoldings;
   /** Present only when the balance-history endpoint returned at least two points. */
   dayChange?: { amount: number; currency: string; asOf: string };
+  /** When balances and positions were fetched from SnapTrade (ISO; the older of the two). */
+  fetchedAt?: string;
+  /**
+   * Set when this account's latest refresh failed and `holdings` is the last good copy from `asOf`.
+   * The account record (and so its total) is still the current one from /accounts.
+   */
+  stale?: { asOf: string; message: string };
 }
 
 /** An account whose data couldn't be loaded. The rest of the portfolio is still shown. */
@@ -200,7 +207,12 @@ export interface AccountFailure {
 
 export interface PortfolioSnapshot {
   accounts: AccountSnapshot[];
+  /** Accounts left out entirely: their refresh failed and there was no earlier copy to show. */
   failures: AccountFailure[];
+  /**
+   * When the data shown was fetched (ISO): the oldest of the /accounts response and the balances and
+   * positions of every account that refreshed. Stale accounts carry their own time instead.
+   */
   fetchedAt: string;
 }
 

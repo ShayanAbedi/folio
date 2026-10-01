@@ -3,7 +3,7 @@ import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
 import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, dayChange, fogIdleLabel, groupByInstitution, netWorth } from "./lib/portfolio";
-import { formatMoney, formatMoneyWithCode, MASK, mask } from "./lib/format";
+import { formatAsOf, formatMoney, formatMoneyWithCode, MASK, mask } from "./lib/format";
 import { classifyError } from "./components/empty";
 import { launch } from "./components/actions";
 
@@ -13,6 +13,7 @@ export default function MenuBarPortfolio() {
   const { privacy, ready, toggle } = usePrivacy();
 
   const accounts = snapshot?.accounts ?? [];
+  const failures = snapshot?.failures ?? [];
   const nw = netWorth(accounts.map((a) => a.account));
   const change = dayChange(accounts);
   const primaryChange = nw.primary ? change?.find((c) => c.currency === nw.primary?.currency) : undefined;
@@ -39,6 +40,17 @@ export default function MenuBarPortfolio() {
       : ` · ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
   const titleWithChange = `${title}${deltaText}`;
   const icon = Icon.Coins;
+  // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
+  const updated = !snapshot
+    ? null
+    : isLoading
+      ? { title: "Updating…", tooltip: `Showing data from ${formatAsOf(snapshot.fetchedAt)}` }
+      : error
+        ? {
+            title: `Couldn't refresh · showing ${formatAsOf(snapshot.fetchedAt)}`,
+            tooltip: error instanceof Error ? error.message : String(error),
+          }
+        : { title: `Updated ${formatAsOf(snapshot.fetchedAt)}`, tooltip: undefined };
 
   return (
     <MenuBarExtra
@@ -90,16 +102,36 @@ export default function MenuBarPortfolio() {
               {g.items.map((s) => (
                 <MenuBarExtra.Item
                   key={s.account.id}
+                  icon={s.stale ? { source: Icon.Warning, tintColor: Color.Orange } : undefined}
                   title={s.account.name ?? s.account.number}
-                  subtitle={mask(
+                  subtitle={`${mask(
                     formatMoneyWithCode(s.account.balance.total?.amount, s.account.balance.total?.currency),
                     privacy,
-                  )}
+                  )}${s.stale ? ` · holdings as of ${formatAsOf(s.stale.asOf)}` : ""}`}
+                  tooltip={
+                    s.stale
+                      ? `Couldn't refresh this account's holdings (${s.stale.message}). Showing the last ones loaded, from ${formatAsOf(s.stale.asOf)}.`
+                      : undefined
+                  }
                   onAction={() => launch("show-portfolio")}
                 />
               ))}
             </MenuBarExtra.Section>
           ))}
+          {failures.length > 0 && (
+            <MenuBarExtra.Section title="Not in Net Worth">
+              {failures.map((f) => (
+                <MenuBarExtra.Item
+                  key={f.account.id}
+                  icon={{ source: Icon.ExclamationMark, tintColor: Color.Red }}
+                  title={f.account.name ?? f.account.number}
+                  subtitle={`${f.account.institution_name} · couldn't load`}
+                  tooltip={f.message}
+                  onAction={() => launch("show-portfolio")}
+                />
+              ))}
+            </MenuBarExtra.Section>
+          )}
           {fog && fog.primary && (
             <MenuBarExtra.Section title="Fog">
               <MenuBarExtra.Item
@@ -118,6 +150,7 @@ export default function MenuBarPortfolio() {
         <MenuBarExtra.Item icon={Icon.Receipt} title="Show Activities" onAction={() => launch("show-activities")} />
       </MenuBarExtra.Section>
       <MenuBarExtra.Section>
+        {updated && <MenuBarExtra.Item icon={Icon.Clock} title={updated.title} tooltip={updated.tooltip} />}
         <MenuBarExtra.Item
           icon={privacy ? Icon.Eye : Icon.EyeDisabled}
           title={privacy ? "Show Balances" : "Hide Balances"}

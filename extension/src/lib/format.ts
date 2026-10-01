@@ -69,6 +69,25 @@ export function formatDate(iso: string | null | undefined): string {
   return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
+/**
+ * A fetch time for "Updated …" / "as of …" labels: "10:42 AM" today, "Sep 29, 10:42 AM" otherwise
+ * (local time). `now` is injectable for tests.
+ */
+export function formatAsOf(iso: string | null | undefined, now: Date = new Date()): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+  if (d.toDateString() === now.toDateString()) return time;
+  const sameYear = d.getFullYear() === now.getFullYear();
+  const date = d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    ...(sameYear ? {} : { year: "numeric" }),
+  });
+  return `${date}, ${time}`;
+}
+
 export function formatRelativeDays(days: number | null): string {
   if (days === null) return "—";
   if (days === 0) return "today";

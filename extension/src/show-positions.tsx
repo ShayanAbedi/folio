@@ -19,6 +19,9 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
   const { privacy, ready, toggle } = usePrivacy();
   const all = snapshot ? flattenPositions(snapshot.accounts) : [];
   const matches = searchPositions(all, query);
+  const staleAsOf = new Map(
+    (snapshot?.accounts ?? []).flatMap((s) => (s.stale ? [[s.account.id, s.stale.asOf] as const] : [])),
+  );
 
   return (
     <List
@@ -39,7 +42,14 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
           description="Folio only searches what you already hold. It doesn't look up quotes."
         />
       ) : (
-        <List.Section title={query ? `Matches for ${query.toUpperCase()}` : "Positions"} subtitle={`${matches.length}`}>
+        <List.Section
+          title={query ? `Matches for ${query.toUpperCase()}` : "Positions"}
+          subtitle={
+            staleAsOf.size > 0
+              ? `${matches.length} · ${staleAsOf.size} account${staleAsOf.size === 1 ? "" : "s"} not refreshed`
+              : `${matches.length}`
+          }
+        >
           {matches.map((p) => (
             <PositionItem
               key={p.key}
@@ -49,6 +59,7 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
               onToggleDetail={() => setShowDetail((v) => !v)}
               onTogglePrivacy={toggle}
               onRefresh={refresh}
+              staleAsOf={staleAsOf.get(p.accountId)}
             />
           ))}
         </List.Section>

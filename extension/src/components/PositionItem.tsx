@@ -1,6 +1,7 @@
 import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
 import type { FlatPosition } from "../lib/portfolio";
 import {
+  formatAsOf,
   formatMoney,
   formatMoneyWithCode,
   formatPercent,
@@ -20,6 +21,8 @@ interface Props {
   onRefresh: () => Promise<void>;
   /** Hide the account column when the list is already scoped to one account. */
   hideAccount?: boolean;
+  /** Set when this position's account couldn't be refreshed: when the shown data is from (ISO). */
+  staleAsOf?: string;
 }
 
 function pnlColor(v: number | null): Color {
@@ -35,12 +38,22 @@ export function PositionItem({
   onTogglePrivacy,
   onRefresh,
   hideAccount,
+  staleAsOf,
 }: Props) {
   const value = mask(formatMoney(p.marketValue, p.currency), privacy);
   const pnl = mask(formatSigned(p.openPnl, p.currency), privacy);
+  const stale: List.Item.Accessory[] = staleAsOf
+    ? [
+        {
+          icon: { source: Icon.Warning, tintColor: Color.Orange },
+          tooltip: `Couldn't refresh ${p.accountName}. Showing its positions from ${formatAsOf(staleAsOf)}.`,
+        },
+      ]
+    : [];
   const accessories: List.Item.Accessory[] = showDetail
-    ? [{ text: value }]
+    ? [...stale, { text: value }]
     : [
+        ...stale,
         ...(hideAccount ? [] : [{ tag: p.accountName, tooltip: `${p.institution} · ${p.accountName}` }]),
         ...(p.weight !== null
           ? [{ text: formatPercent(p.weight), tooltip: `Weight within ${p.currency} positions` }]
@@ -82,6 +95,12 @@ export function PositionItem({
       {p.securityType ? <List.Item.Detail.Metadata.Label title="Type" text={p.securityType} /> : null}
       {p.exchange ? <List.Item.Detail.Metadata.Label title="Exchange" text={p.exchange} /> : null}
       <List.Item.Detail.Metadata.Label title="Currency" text={p.currency} />
+      {staleAsOf ? (
+        <List.Item.Detail.Metadata.Label
+          title="As Of"
+          text={{ value: `${formatAsOf(staleAsOf)} (couldn't refresh)`, color: Color.Orange }}
+        />
+      ) : null}
     </List.Item.Detail.Metadata>
   );
 

@@ -1,5 +1,5 @@
 /** Typed SnapTrade endpoints used by Folio. All GET except the Connection Portal link. */
-import { snaptrade } from "./api";
+import { snaptrade, type FetchMeta } from "./api";
 import type {
   Account,
   AllAccountPositionsResponse,
@@ -11,20 +11,25 @@ import type {
   PaginatedActivities,
 } from "./types";
 
-export function listAccounts(fresh = false): Promise<Account[]> {
-  return snaptrade<Account[]>("/accounts", { fresh, ttlMs: 120_000 });
+export function listAccounts(fresh = false, meta?: FetchMeta): Promise<Account[]> {
+  return snaptrade<Account[]>("/accounts", { fresh, ttlMs: 120_000, meta });
 }
 
 /** GET /accounts/{id}/balances. (The older /holdings endpoint returns 410 for newer SnapTrade accounts.) */
-export function getAccountBalances(accountId: string, fresh = false): Promise<Balance[]> {
-  return snaptrade<Balance[]>(`/accounts/${encodeURIComponent(accountId)}/balances`, { fresh, ttlMs: 90_000 });
+export function getAccountBalances(accountId: string, fresh = false, meta?: FetchMeta): Promise<Balance[]> {
+  return snaptrade<Balance[]>(`/accounts/${encodeURIComponent(accountId)}/balances`, { fresh, ttlMs: 90_000, meta });
 }
 
 /** GET /accounts/{id}/positions/all: equities, ETFs, crypto, funds and options in one list. */
-export function getAccountPositions(accountId: string, fresh = false): Promise<AllAccountPositionsResponse> {
+export function getAccountPositions(
+  accountId: string,
+  fresh = false,
+  meta?: FetchMeta,
+): Promise<AllAccountPositionsResponse> {
   return snaptrade<AllAccountPositionsResponse>(`/accounts/${encodeURIComponent(accountId)}/positions/all`, {
     fresh,
     ttlMs: 90_000,
+    meta,
   });
 }
 

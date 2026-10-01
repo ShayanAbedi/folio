@@ -3,7 +3,7 @@ import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
 import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, fogIdleLabel, quietStreak } from "./lib/portfolio";
-import { formatDate, formatMoney, formatMoneyWithCode, formatRelativeDays, mask } from "./lib/format";
+import { formatAsOf, formatDate, formatMoney, formatMoneyWithCode, formatRelativeDays, mask } from "./lib/format";
 import { NavigationActions, PrivacyAction, RefreshAction, TradeStubAction } from "./components/actions";
 import { classifyError, DetailEmpty } from "./components/empty";
 
@@ -74,6 +74,17 @@ export default function ShowFog() {
     md.push(
       "",
       `> ⚠️ Excluded because they couldn't be loaded: ${names.join(", ")}. Cash and streaks above don't include them.`,
+    );
+  }
+  const stale = portfolio.snapshot.accounts.filter((s) => s.stale);
+  if (stale.length > 0) {
+    md.push(
+      "",
+      `> ⚠️ Couldn't refresh, so their cash is from the last successful load: ${stale
+        .map(
+          (s) => `${s.account.institution_name} · ${s.account.name ?? s.account.number} (${formatAsOf(s.stale!.asOf)})`,
+        )
+        .join(", ")}.`,
     );
   }
 

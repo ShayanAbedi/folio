@@ -3,7 +3,7 @@ import { useState } from "react";
 import { usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { dayChange, flattenPositions, groupByInstitution, netWorth, withWeights } from "./lib/portfolio";
-import { formatDate, formatMoney, formatMoneyWithCode, formatSigned, mask } from "./lib/format";
+import { formatAsOf, formatDate, formatMoney, formatMoneyWithCode, formatSigned, mask } from "./lib/format";
 import type { AccountSnapshot } from "./lib/types";
 import { NavigationActions, PrivacyAction, RefreshAction, TradeStubAction } from "./components/actions";
 import { classifyError, ListEmpty } from "./components/empty";
@@ -19,6 +19,14 @@ export default function ShowPortfolio() {
   const nw = netWorth(accounts.map((a) => a.account));
   const change = dayChange(accounts);
   const groups = groupByInstitution(accounts);
+  // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
+  const updated = !snapshot
+    ? undefined
+    : isLoading
+      ? `Updating… · showing ${formatAsOf(snapshot.fetchedAt)}`
+      : error
+        ? `Couldn't refresh · showing ${formatAsOf(snapshot.fetchedAt)}`
+        : `Updated ${formatAsOf(snapshot.fetchedAt)}`;
   const commonActions = (
     <>
       <PrivacyAction privacy={privacy} onToggle={toggle} />
@@ -34,7 +42,7 @@ export default function ShowPortfolio() {
         <ListEmpty kind="connect" onRetry={refresh} />
       ) : (
         <>
-          <List.Section title="Net Worth">
+          <List.Section title="Net Worth" subtitle={updated}>
             {nw.byCurrency.map((t, i) => (
               <List.Item
                 key={t.currency}
@@ -135,6 +143,13 @@ function AccountRow({
   const positions = (s.holdings.positions ?? []).length + (s.holdings.option_positions ?? []).length;
   const synced = s.account.sync_status?.holdings?.last_successful_sync;
   const accessories: List.Item.Accessory[] = [];
+  if (s.stale) {
+    accessories.push({
+      icon: { source: Icon.Warning, tintColor: Color.Orange },
+      text: `as of ${formatAsOf(s.stale.asOf)}`,
+      tooltip: `Couldn't refresh holdings (${s.stale.message}). Cash and positions are the last ones loaded, from ${formatAsOf(s.stale.asOf)}. The account total is current.`,
+    });
+  }
   if (cash.length > 0) {
     accessories.push({
       tag: {
@@ -191,6 +206,7 @@ function AccountHoldings({ snapshot }: { snapshot: AccountSnapshot }) {
   const positions = withWeights(flattenPositions([snapshot]));
   const cash = (snapshot.holdings.balances ?? []).filter((b) => typeof b.cash === "number");
   const title = `${snapshot.account.institution_name} · ${snapshot.account.name ?? snapshot.account.number}`;
+  const asOf = snapshot.stale ? `as of ${formatAsOf(snapshot.stale.asOf)} (couldn't refresh)` : undefined;
   return (
     <List
       navigationTitle={title}
@@ -198,7 +214,7 @@ function AccountHoldings({ snapshot }: { snapshot: AccountSnapshot }) {
       searchBarPlaceholder={`Search ${snapshot.account.name ?? "holdings"}…`}
     >
       {cash.length > 0 && (
-        <List.Section title="Cash">
+        <List.Section title="Cash" subtitle={asOf}>
           {cash.map((b) => (
             <List.Item
               key={b.currency?.code ?? "cash"}
@@ -227,7 +243,7 @@ function AccountHoldings({ snapshot }: { snapshot: AccountSnapshot }) {
           ))}
         </List.Section>
       )}
-      <List.Section title="Positions" subtitle={`${positions.length}`}>
+      <List.Section title="Positions" subtitle={asOf ? `${positions.length} · ${asOf}` : `${positions.length}`}>
         {positions.map((p) => (
           <PositionItem
             key={p.key}
