@@ -13,9 +13,12 @@
 - Accounts whose data SnapTrade hasn't updated recently (for example Wealthsimple) show how old it is: "data from …"
 - The day change only adds up accounts whose balance snapshots cover the same dates, shows those dates, and stays out of the Menu Bar title when it isn't recent
 - Internal cash transfers between accounts now show under Deposits and count as new cash in Fog
-- ⌘R inside an account's holdings now updates the holdings shown
+- ⌘R inside an account's holdings now updates the holdings shown and the portfolio list behind it
 - ⌘R pressed again while a refresh is running joins it instead of starting another
-- A SnapTrade request that gets no answer within 60 seconds now fails instead of leaving Folio loading; the account falls back to its last loaded holdings if it has any, and otherwise is listed as couldn't load
+- A SnapTrade request that gets no answer within 60 seconds now fails instead of leaving Folio loading (once per brokerage, not once per account); the account falls back to its last loaded holdings if it has any, and otherwise is listed as couldn't load
+- If Folio's sign-in service is briefly unreachable, Folio keeps using your current session instead of asking you to sign in
+- When your session has ended, the Menu Bar and Show Portfolio say so and offer Sign In instead of only showing older numbers
+- Sign-out also clears the portfolio Folio keeps for opening views instantly
 - The menu bar icon turns into a warning when the net worth shown is out of date or leaves accounts out, and accounts SnapTrade reports no balance for are counted as left out instead of silently dropped
 
 ## [Initial Version] - 2026-09-29

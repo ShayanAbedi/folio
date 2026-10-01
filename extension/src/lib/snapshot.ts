@@ -4,6 +4,7 @@
  * holdings, labelled with their time; only an account with nothing to fall back on is left out,
  * and it's reported as a failure.
  */
+import { parseTime } from "./format";
 import type { Account, AccountFailure, AccountSnapshot } from "./types";
 
 /**
@@ -23,11 +24,6 @@ export function toLastGood(s: AccountSnapshot): LastGood | undefined {
   return { holdings: s.holdings, fetchedAt: s.fetchedAt, dataAsOf: s.dataAsOf };
 }
 
-/** Parses an ISO time, reading one without a zone as UTC (not the Mac's local time). */
-function parseUtc(iso: string): number {
-  return Date.parse(/(Z|[+-]\d{2}:?\d{2})$/i.test(iso) || !iso.includes("T") ? iso : `${iso}Z`);
-}
-
 /** Brokerage data more than this far behind the fetch is labelled with its own time. */
 export const OLD_DATA_MS = 60 * 60_000;
 
@@ -37,7 +33,7 @@ export const OLD_DATA_MS = 60 * 60_000;
  */
 export function oldDataAsOf(s: Pick<AccountSnapshot, "dataAsOf" | "fetchedAt">): string | undefined {
   if (!s.dataAsOf || !s.fetchedAt) return undefined;
-  const behind = Date.parse(s.fetchedAt) - parseUtc(s.dataAsOf);
+  const behind = Date.parse(s.fetchedAt) - parseTime(s.dataAsOf);
   return behind > OLD_DATA_MS ? s.dataAsOf : undefined;
 }
 

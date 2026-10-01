@@ -204,3 +204,39 @@ test("worker errors other than invalid_grant don't sign out", async () => {
   assert.equal(store.removed, 0);
   assert.equal(store.tokens?.refreshToken, "rt0");
 });
+
+test("an early refresh that fails because the auth worker is down keeps using the still-valid token", async () => {
+  const store = new SharedStore(tokensAged(36_000_000 - 2 * 60_000)); // 2 min left: inside the early window
+  let calls = 0;
+  const m = createTokenManager({
+    store,
+    exchange: async () => {
+      calls += 1;
+      throw new AuthError("Auth worker /oauth/refresh failed (HTTP 503)", "worker");
+    },
+  });
+  assert.equal(await m.getAccessToken(), "at0");
+  assert.equal(calls, 1, "it did try");
+  assert.equal(store.removed, 0);
+});
+
+test("once the token has really expired, an auth-worker failure is reported instead of using it", async () => {
+  const store = new SharedStore(tokensAged(36_000_000 + 1000));
+  const m = createTokenManager({
+    store,
+    exchange: async () => {
+      throw new AuthError("Auth worker /oauth/refresh failed (HTTP 503)", "worker");
+    },
+  });
+  await assert.rejects(m.getAccessToken(), (e: unknown) => e instanceof AuthError && e.reason === "worker");
+});
+
+test("an early refresh that finds the session dead still signs out", async () => {
+  const server = new FakeSnapTrade("rt0");
+  server.revokeAll();
+  const store = new SharedStore(tokensAged(36_000_000 - 2 * 60_000));
+  await assert.rejects(manager(store, server).getAccessToken(), (e: unknown) => {
+    return e instanceof AuthError && e.reason === "signed-out";
+  });
+  assert.equal(store.removed, 1);
+});

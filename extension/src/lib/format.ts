@@ -69,13 +69,18 @@ export function formatDate(iso: string | null | undefined): string {
   return d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
+/** Parses an ISO time (epoch ms), reading one without a zone as UTC, not the Mac's local time. */
+export function parseTime(iso: string): number {
+  return Date.parse(/(Z|[+-]\d{2}:?\d{2})$/i.test(iso) || !iso.includes("T") ? iso : `${iso}Z`);
+}
+
 /**
  * A fetch time for "Updated …" / "as of …" labels: "10:42 AM" today, "Sep 29, 10:42 AM" otherwise
  * (local time). `now` is injectable for tests.
  */
 export function formatAsOf(iso: string | null | undefined, now: Date = new Date()): string {
   if (!iso) return "—";
-  const d = new Date(iso);
+  const d = new Date(parseTime(iso));
   if (Number.isNaN(d.getTime())) return iso;
   const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   if (d.toDateString() === now.toDateString()) return time;

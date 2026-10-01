@@ -186,3 +186,8 @@ test("snapshot dates format as calendar dates in any time zone", () => {
   assert.equal(formatSnapshotPeriod({ from: "2026-09-29", asOf: "2026-10-01" }), "Sep 29 → Oct 1");
   assert.equal(formatSnapshotPeriod({ asOf: "2026-10-01" }), "to Oct 1");
 });
+
+test("a time without a zone is shown as the same instant it's compared as (UTC)", () => {
+  const now = new Date("2026-10-01T12:00:00Z");
+  assert.equal(formatAsOf("2026-10-01T09:30:00", now), formatAsOf("2026-10-01T09:30:00Z", now));
+});

@@ -67,13 +67,15 @@ export default function MenuBarPortfolio() {
     .filter(Boolean)
     .join(" ");
   // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
+  // The session ended while older data is still on screen: say so and offer to sign in.
+  const signedOutWithData = showingOld && classifyError(error) === "sign-in";
   const updated = !snapshot
     ? null
     : isLoading
       ? { title: "Updating…", tooltip: `Showing data from ${formatAsOf(snapshot.fetchedAt)}` }
       : error
         ? {
-            title: `Couldn't refresh · showing ${formatAsOf(snapshot.fetchedAt)}`,
+            title: `${signedOutWithData ? "Signed out" : "Couldn't refresh"} · showing ${formatAsOf(snapshot.fetchedAt)}`,
             tooltip: error instanceof Error ? error.message : String(error),
           }
         : { title: `Updated ${formatAsOf(snapshot.fetchedAt)}`, tooltip: undefined };
@@ -202,6 +204,9 @@ export default function MenuBarPortfolio() {
       </MenuBarExtra.Section>
       <MenuBarExtra.Section>
         {updated && <MenuBarExtra.Item icon={Icon.Clock} title={updated.title} tooltip={updated.tooltip} />}
+        {signedOutWithData && (
+          <MenuBarExtra.Item icon={Icon.Person} title="Sign In with SnapTrade…" onAction={() => launch("sign-in")} />
+        )}
         <MenuBarExtra.Item
           icon={privacy ? Icon.Eye : Icon.EyeDisabled}
           title={privacy ? "Show Balances" : "Hide Balances"}

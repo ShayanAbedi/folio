@@ -21,7 +21,7 @@ import {
 } from "./lib/format";
 import { oldDataAsOf } from "./lib/snapshot";
 import type { AccountSnapshot } from "./lib/types";
-import { NavigationActions, PrivacyAction, RefreshAction, TradeStubAction } from "./components/actions";
+import { launch, NavigationActions, PrivacyAction, RefreshAction, TradeStubAction } from "./components/actions";
 import { classifyError, ListEmpty } from "./components/empty";
 import { PositionItem } from "./components/PositionItem";
 
@@ -36,12 +36,14 @@ export default function ShowPortfolio() {
   const change = dayChange(accounts);
   const groups = groupByInstitution(accounts);
   // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
+  // The session ended while older data is still on screen: say so and offer to sign in.
+  const signedOutWithData = Boolean(error) && accounts.length > 0 && classifyError(error) === "sign-in";
   const updated = !snapshot
     ? undefined
     : isLoading
       ? `Updating… · showing ${formatAsOf(snapshot.fetchedAt)}`
       : error
-        ? `Couldn't refresh · showing ${formatAsOf(snapshot.fetchedAt)}`
+        ? `${signedOutWithData ? "Signed out" : "Couldn't refresh"} · showing ${formatAsOf(snapshot.fetchedAt)}`
         : `Updated ${formatAsOf(snapshot.fetchedAt)}`;
   const commonActions = (
     <>
@@ -58,6 +60,21 @@ export default function ShowPortfolio() {
         <ListEmpty kind="connect" onRetry={refresh} />
       ) : (
         <>
+          {signedOutWithData && (
+            <List.Section title="Signed Out">
+              <List.Item
+                icon={{ source: Icon.Person, tintColor: Color.Orange }}
+                title="Sign In with SnapTrade"
+                subtitle="Your session ended; the numbers below are from before"
+                actions={
+                  <ActionPanel>
+                    <Action title="Sign in with SnapTrade" icon={Icon.Person} onAction={() => launch("sign-in")} />
+                    <NavigationActions />
+                  </ActionPanel>
+                }
+              />
+            </List.Section>
+          )}
           <List.Section
             title="Net Worth"
             subtitle={[
@@ -123,7 +140,7 @@ export default function ShowPortfolio() {
                   key={s.account.id}
                   snapshot={s}
                   privacy={privacy}
-                  onOpen={() => push(<AccountHoldings accountId={s.account.id} initial={s} />)}
+                  onOpen={() => push(<AccountHoldings accountId={s.account.id} initial={s} refresh={refresh} />)}
                   actions={commonActions}
                 />
               ))}
@@ -241,9 +258,18 @@ function AccountRow({
  * One account's cash and positions. Reads the snapshot the list already loaded (no load of its own on
  * open) and follows it, so ⌘R here updates what's shown.
  */
-function AccountHoldings({ accountId, initial }: { accountId: string; initial: AccountSnapshot }) {
+function AccountHoldings({
+  accountId,
+  initial,
+  refresh,
+}: {
+  accountId: string;
+  initial: AccountSnapshot;
+  /** The list's refresh, so ⌘R here reloads the list too and both show the result. */
+  refresh: () => Promise<void>;
+}) {
   const { privacy, toggle } = usePrivacy();
-  const { snapshot: portfolio, refresh } = usePortfolio({ load: false });
+  const { snapshot: portfolio } = usePortfolio({ load: false });
   const [showDetail, setShowDetail] = useState(false);
   const snapshot = portfolio?.accounts.find((a) => a.account.id === accountId) ?? initial;
   const positions = withWeights(flattenPositions([snapshot]));

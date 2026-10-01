@@ -31,6 +31,13 @@ const REQUEST_TIMEOUT_MS = 60_000;
  */
 const sharedGet = inFlight<{ data: unknown; at: number }>();
 
+/** ApiError status for a request that got no answer in time (no HTTP status exists). */
+export const TIMEOUT_STATUS = 0;
+
+export function isTimeout(e: unknown): boolean {
+  return e instanceof ApiError && e.status === TIMEOUT_STATUS;
+}
+
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -90,7 +97,7 @@ async function once<T>(
       REQUEST_TIMEOUT_MS,
     );
   } catch (e) {
-    if (e instanceof RequestTimeout) throw new ApiError(e.message, 0);
+    if (e instanceof RequestTimeout) throw new ApiError(e.message, TIMEOUT_STATUS);
     throw e;
   }
   let data: T | undefined;

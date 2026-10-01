@@ -138,7 +138,17 @@ export function createTokenManager(deps: TokenManagerDeps) {
       return tokens.accessToken;
     }
     if (tokens.refreshToken) {
-      return opts.force || expiresSoon(tokens, t) ? refresh(tokens.refreshToken) : tokens.accessToken;
+      if (opts.force || expiresSoon(tokens, t, 0)) return refresh(tokens.refreshToken);
+      if (!expiresSoon(tokens, t)) return tokens.accessToken;
+      // Refreshing early, while the current token still works. If the refresh fails for any reason
+      // other than a dead session (auth worker down or rate-limited, network), keep using the current
+      // token rather than failing every request; the next call tries again.
+      try {
+        return await refresh(tokens.refreshToken);
+      } catch (e) {
+        if (e instanceof AuthError && e.reason === "signed-out") throw e;
+        return tokens.accessToken;
+      }
     }
     // No refresh token: nothing to refresh with, so only give up once the token has really expired.
     if (opts.force || expiresSoon(tokens, t, 0)) {

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { keyedLimiter } from "../src/lib/limit.ts";
+import { failFast, keyedLimiter } from "../src/lib/limit.ts";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -71,4 +71,46 @@ test("queued tasks start in order", async () => {
     ),
   );
   assert.deepEqual(order, [1, 2, 3, 4]);
+});
+
+test("failFast: after one timeout on a connection, its queued requests fail at once; others carry on", async () => {
+  const timeout = new Error("SnapTrade didn't respond within 60 s");
+  const run = keyedLimiter(2);
+  const stalled = failFast((e) => e === timeout);
+  const started: string[] = [];
+  const task = (key: string, id: string, fails: boolean) => () =>
+    run(key, () =>
+      stalled(key, async () => {
+        started.push(id);
+        await sleep(20);
+        if (fails) throw timeout;
+        return id;
+      }),
+    );
+  const results = await Promise.allSettled([
+    task("ws", "ws1", true)(),
+    task("ws", "ws2", true)(),
+    task("ws", "ws3", false)(),
+    task("ws", "ws4", false)(),
+    task("webull", "wb1", false)(),
+  ]);
+  assert.deepEqual(
+    results.map((r) => r.status),
+    ["rejected", "rejected", "rejected", "rejected", "fulfilled"],
+  );
+  assert.ok(
+    results.slice(2, 4).every((r) => r.status === "rejected" && r.reason === timeout),
+    "same error reused",
+  );
+  assert.deepEqual(started.sort(), ["wb1", "ws1", "ws2"], "ws3 and ws4 never ran, so no second round of waiting");
+});
+
+test("failFast ignores errors that don't trip it", async () => {
+  const stalled = failFast(() => false);
+  await assert.rejects(
+    stalled("k", async () => {
+      throw new Error("429");
+    }),
+  );
+  assert.equal(await stalled("k", async () => "ok"), "ok");
 });

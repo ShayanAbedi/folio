@@ -10,9 +10,9 @@ import {
   fixtureHoldings,
 } from "../fixtures";
 import { AuthError, isSignedIn } from "./auth";
-import type { FetchMeta } from "./api";
+import { type FetchMeta, isTimeout } from "./api";
 import { clearLastGood, readLastGood, saveLastGood } from "./last-good";
-import { keyedLimiter } from "./limit";
+import { failFast, keyedLimiter } from "./limit";
 import { authMode } from "./preferences";
 import { assembleAccounts, HoldingsRefreshError, type LastGood, oldest, toLastGood } from "./snapshot";
 import {
@@ -91,10 +91,13 @@ function dayChangeFrom(history: AccountValueHistoryResponse | null, currency: st
  */
 const perConnection = keyedLimiter(2);
 
+type FailFast = ReturnType<typeof failFast>;
+
 async function snapshotFor(
   account: Account,
   fresh: boolean,
   mode: ReturnType<typeof authMode>,
+  stalled: FailFast,
 ): Promise<AccountSnapshot> {
   if (mode === "fixtures") {
     return {
@@ -113,8 +116,8 @@ async function snapshotFor(
   let positions: Awaited<ReturnType<typeof getAccountPositions>>;
   try {
     [balances, positions] = await Promise.all([
-      perConnection(connection, () => getAccountBalances(account.id, fresh, balancesMeta)),
-      perConnection(connection, () => getAccountPositions(account.id, fresh, positionsMeta)),
+      perConnection(connection, () => stalled(connection, () => getAccountBalances(account.id, fresh, balancesMeta))),
+      perConnection(connection, () => stalled(connection, () => getAccountPositions(account.id, fresh, positionsMeta))),
     ]);
   } catch (e) {
     if (e instanceof AuthError) throw e;
@@ -141,7 +144,10 @@ export async function loadPortfolio(fresh = false): Promise<PortfolioSnapshot> {
   const accounts = (mode === "fixtures" ? FIXTURE_ACCOUNTS : await listAccounts(fresh, accountsMeta)).filter(
     isInvestmentAccount,
   );
-  const results = await Promise.allSettled(accounts.map((a) => snapshotFor(a, fresh, mode)));
+  // Once a connection times out in this load, its other queued requests fail at once (same error)
+  // instead of each waiting out its own 60 s behind the per-connection limit.
+  const stalled = failFast(isTimeout);
+  const results = await Promise.allSettled(accounts.map((a) => snapshotFor(a, fresh, mode, stalled)));
   const failed = accounts.filter((_, i) => results[i].status === "rejected");
   const fallback =
     mode === "fixtures" || failed.length === 0

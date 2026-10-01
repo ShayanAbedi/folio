@@ -48,8 +48,12 @@ export function cacheClear(): void {
   new Cache().clear();
 }
 
+/** Where views keep their last result for instant paint (see hooks.ts). ⌘R leaves it; sign-out clears it. */
+export const VIEW_CACHE_NAMESPACE = "folio-view";
+
 /** Everything Folio keeps on disk about the signed-in user's portfolio. Used on sign-in and sign-out. */
 export async function clearSessionData(): Promise<void> {
   cacheClear();
+  new Cache({ namespace: VIEW_CACHE_NAMESPACE }).clear();
   await clearLastGood();
 }
