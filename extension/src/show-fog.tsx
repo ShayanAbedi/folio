@@ -1,6 +1,6 @@
 import { Action, ActionPanel, Detail, Icon } from "@raycast/api";
 import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
-import { useActivities, usePortfolio } from "./lib/hooks";
+import { refreshTogether, useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, fogIdleLabel, quietStreak } from "./lib/portfolio";
 import { formatAsOf, formatDate, formatMoney, formatMoneyWithCode, formatRelativeDays, mask } from "./lib/format";
@@ -14,7 +14,7 @@ export default function ShowFog() {
   const { privacy, ready, toggle } = usePrivacy();
   const isLoading = portfolio.isLoading || acts.isLoading || !ready;
   const refresh = async () => {
-    await Promise.all([portfolio.refresh(), acts.refresh()]);
+    await refreshTogether(portfolio.revalidate, acts.revalidate);
   };
 
   const error = portfolio.error ?? acts.error;

@@ -1,6 +1,6 @@
 import { Color, Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@raycast/api";
 import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
-import { useActivities, usePortfolio } from "./lib/hooks";
+import { refreshTogether, useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, dayChange, fogIdleLabel, groupByInstitution, isRecentSnapshot, netWorth } from "./lib/portfolio";
 import { formatAsOf, formatMoney, formatMoneyWithCode, formatSnapshotPeriod, MASK, mask } from "./lib/format";
@@ -9,7 +9,7 @@ import { classifyError } from "./components/empty";
 import { launch } from "./components/actions";
 
 export default function MenuBarPortfolio() {
-  const { snapshot, isLoading, error, refresh } = usePortfolio();
+  const { snapshot, isLoading, error, revalidate } = usePortfolio();
   const acts = useActivities(ACTIVITY_WINDOW_DAYS);
   const { privacy, ready, toggle } = usePrivacy();
 
@@ -186,7 +186,7 @@ export default function MenuBarPortfolio() {
           icon={Icon.ArrowClockwise}
           title="Refresh"
           shortcut={Keyboard.Shortcut.Common.Refresh}
-          onAction={() => Promise.all([refresh(), acts.refresh()]).then(() => undefined)}
+          onAction={() => refreshTogether(revalidate, acts.revalidate)}
         />
         <MenuBarExtra.Item icon={Icon.Gear} title="Preferences…" onAction={openExtensionPreferences} />
       </MenuBarExtra.Section>
