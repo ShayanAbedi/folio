@@ -10,9 +10,18 @@ import { authMode } from "./preferences";
 import { cacheGeneration, cacheGetEntry, cacheSet } from "./cache";
 import { inFlight } from "./inflight";
 import { rateLimitMessage } from "./rate-limit";
+import { fetchText, RequestTimeout } from "./timed-fetch";
 
 /** Identifies Folio in SnapTrade's request logs. */
 const USER_AGENT = "Folio (Raycast extension; +https://github.com/ShayanAbedi/folio)";
+
+/**
+ * Per attempt. A brokerage that never answers would otherwise hold the Menu Bar in "loading" for
+ * minutes; after this the account falls back to its last loaded holdings, labelled. Only SnapTrade
+ * data requests get it: never the token refresh, where aborting after the worker rotated the
+ * single-use refresh token would lose the new pair.
+ */
+const REQUEST_TIMEOUT_MS = 60_000;
 
 /**
  * Concurrent identical GETs share one request. Several views load at once (the Menu Bar loads the
@@ -64,24 +73,33 @@ async function once<T>(
   opts: RequestOptions,
   token: string,
 ): Promise<{ status: number; data: T | undefined; raw: string; headers: Headers }> {
-  const res = await fetch(url, {
-    method: opts.method ?? "GET",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-      "User-Agent": USER_AGENT,
-      ...(opts.body !== undefined ? { "Content-Type": "application/json" } : {}),
-    },
-    body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-  });
-  const raw = await res.text();
+  let res: Awaited<ReturnType<typeof fetchText>>;
+  try {
+    res = await fetchText(
+      url,
+      {
+        method: opts.method ?? "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "User-Agent": USER_AGENT,
+          ...(opts.body !== undefined ? { "Content-Type": "application/json" } : {}),
+        },
+        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+      },
+      REQUEST_TIMEOUT_MS,
+    );
+  } catch (e) {
+    if (e instanceof RequestTimeout) throw new ApiError(e.message, 0);
+    throw e;
+  }
   let data: T | undefined;
   try {
-    data = raw ? (JSON.parse(raw) as T) : undefined;
+    data = res.raw ? (JSON.parse(res.raw) as T) : undefined;
   } catch {
     data = undefined;
   }
-  return { status: res.status, data, raw, headers: res.headers };
+  return { status: res.status, data, raw: res.raw, headers: res.headers };
 }
 
 export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Promise<T> {

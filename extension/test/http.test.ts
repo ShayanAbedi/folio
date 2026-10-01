@@ -2,6 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { inFlight } from "../src/lib/inflight.ts";
 import { rateLimitMessage } from "../src/lib/rate-limit.ts";
+import { fetchText, RequestTimeout } from "../src/lib/timed-fetch.ts";
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
@@ -50,4 +51,41 @@ test("the 429 message uses SnapTrade's limit and reset headers", () => {
     rateLimitMessage(() => null),
     "SnapTrade's rate limit for this account was reached; try again in a minute",
   );
+});
+
+test("a request with no answer, or a body that stalls, fails with RequestTimeout instead of hanging", async () => {
+  const { createServer } = await import("node:http");
+  const server = createServer((req, res) => {
+    if (req.url === "/stall-body") {
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.write('{"partial":');
+    }
+    // "/hang": never respond at all
+  });
+  await new Promise<void>((r) => server.listen(0, "127.0.0.1", r));
+  const { port } = server.address() as { port: number };
+  try {
+    for (const path of ["/hang", "/stall-body"]) {
+      const started = Date.now();
+      await assert.rejects(fetchText(`http://127.0.0.1:${port}${path}`, {}, 150), (e: unknown) => {
+        return e instanceof RequestTimeout && e.ms === 150 && /didn't respond within 0.15 s/.test(e.message);
+      });
+      assert.ok(Date.now() - started < 2000, `${path} gave up promptly`);
+    }
+    // A normal response is returned with its status, headers and body.
+    const ok = createServer((_, res) => {
+      res.writeHead(429, { "X-RateLimit-Account-Reset": "54" });
+      res.end("{}");
+    });
+    await new Promise<void>((r) => ok.listen(0, "127.0.0.1", r));
+    const okPort = (ok.address() as { port: number }).port;
+    const res = await fetchText(`http://127.0.0.1:${okPort}/`, {}, 1000);
+    assert.equal(res.status, 429);
+    assert.equal(res.headers.get("x-ratelimit-account-reset"), "54");
+    assert.equal(res.raw, "{}");
+    ok.close();
+  } finally {
+    server.closeAllConnections();
+    server.close();
+  }
 });

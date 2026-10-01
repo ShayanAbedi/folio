@@ -34,8 +34,12 @@ export default function MenuBarPortfolio() {
   // Title layout: "<net worth> · ▲ <change>". The arrow glyph sits next to the number it describes; the icon stays neutral.
   // Only a complete, recent change goes in the title: never a partial sum (accounts without history or
   // with snapshots on other dates), and never an old one passed off as today's.
+  // Accounts left out of the net worth: couldn't be loaded at all, or SnapTrade reported no total.
+  // (A stale account still carries its current /accounts total, so it isn't missing.)
+  const excluded = failures.length + nw.missing;
   const delta =
     privacy ||
+    excluded > 0 ||
     !primaryChange ||
     !primaryChange.complete ||
     !isRecentSnapshot(primaryChange.asOf, new Date()) ||
@@ -47,7 +51,21 @@ export default function MenuBarPortfolio() {
       ? ""
       : ` · ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
   const titleWithChange = `${title}${deltaText}`;
-  const icon = Icon.Coins;
+  // Flag it on the menu bar itself when the net worth shown isn't the whole, current picture.
+  // A refresh failed while older data is still on screen (not the Signed out / error screen).
+  const showingOld = Boolean(error) && accounts.length > 0;
+  const degraded = showingOld || excluded > 0;
+  const icon = degraded ? { source: Icon.Warning, tintColor: Color.Orange } : Icon.Coins;
+  const tooltip = [
+    "Folio · net worth.",
+    showingOld && snapshot ? `Couldn't refresh; showing data from ${formatAsOf(snapshot.fetchedAt)}.` : "",
+    excluded > 0 ? `Leaves out ${excluded} account${excluded === 1 ? "" : "s"}.` : "",
+    delta !== null && primaryChange
+      ? `The arrow is the change ${formatSnapshotPeriod(primaryChange)} between SnapTrade balance snapshots (including deposits).`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
   // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
   const updated = !snapshot
     ? null
@@ -61,12 +79,7 @@ export default function MenuBarPortfolio() {
         : { title: `Updated ${formatAsOf(snapshot.fetchedAt)}`, tooltip: undefined };
 
   return (
-    <MenuBarExtra
-      icon={icon}
-      title={titleWithChange}
-      tooltip="Folio · net worth. The arrow is the change between the last two SnapTrade balance snapshots (including deposits), shown only when every account has one for the same recent dates."
-      isLoading={isLoading || acts.isLoading}
-    >
+    <MenuBarExtra icon={icon} title={titleWithChange} tooltip={tooltip} isLoading={isLoading || acts.isLoading}>
       {error && accounts.length === 0 ? (
         <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Folio"}>
           <MenuBarExtra.Item
@@ -104,6 +117,19 @@ export default function MenuBarPortfolio() {
                 />
               );
             })}
+            {excluded > 0 && (
+              <MenuBarExtra.Item
+                icon={{ source: Icon.Warning, tintColor: Color.Orange }}
+                title={`Leaves out ${excluded} account${excluded === 1 ? "" : "s"}`}
+                tooltip={[
+                  failures.length ? `${failures.length} couldn't be loaded` : "",
+                  nw.missing ? `${nw.missing} have no balance from SnapTrade yet` : "",
+                ]
+                  .filter(Boolean)
+                  .join("; ")}
+                onAction={() => launch("show-portfolio")}
+              />
+            )}
           </MenuBarExtra.Section>
           {groupByInstitution(accounts).map((g) => (
             <MenuBarExtra.Section key={g.institution} title={g.institution}>

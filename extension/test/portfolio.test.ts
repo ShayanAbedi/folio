@@ -265,3 +265,15 @@ test("a transfer between two listed accounts isn't new money for Fog", () => {
   const fromOutside = computeFog(snapshots, [into, buy], now, 365);
   assert.equal(fromOutside.idleDays, 1, "a transfer in from an account Folio doesn't see still counts");
 });
+
+test("net worth counts accounts SnapTrade reported no total for instead of dropping them silently", () => {
+  const noTotal = { ...FIXTURE_ACCOUNTS[0], id: "z", balance: { total: null } };
+  const noAmount = { ...FIXTURE_ACCOUNTS[0], id: "w", balance: { total: { currency: "CAD" } } };
+  const nw = netWorth([FIXTURE_ACCOUNTS[0], noTotal, noAmount]);
+  assert.equal(nw.accountCount, 1);
+  assert.equal(nw.missing, 2);
+  assert.equal(netWorth(FIXTURE_ACCOUNTS).missing, 0);
+  const closed = { ...FIXTURE_ACCOUNTS[0], id: "c", status: "closed" as const, balance: { total: null } };
+  const loc = { ...FIXTURE_ACCOUNTS[0], id: "l", account_category: "LOC" as const, balance: { total: null } };
+  assert.equal(netWorth([closed, loc]).missing, 0, "closed and line-of-credit accounts aren't 'left out'");
+});

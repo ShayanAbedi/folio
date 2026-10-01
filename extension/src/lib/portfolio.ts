@@ -17,6 +17,8 @@ export interface NetWorth {
   /** The currency holding the most value (what the menu bar shows). */
   primary: CurrencyTotal | null;
   accountCount: number;
+  /** Investment accounts SnapTrade reported no total for: left out of the sums, so the sums are incomplete. */
+  missing: number;
 }
 
 function accountTotal(account: Account): CurrencyTotal | null {
@@ -33,17 +35,21 @@ export function isInvestmentAccount(account: Account): boolean {
 export function netWorth(accounts: Account[]): NetWorth {
   const totals = new Map<string, number>();
   let count = 0;
+  let missing = 0;
   for (const account of accounts) {
     if (!isInvestmentAccount(account)) continue;
     const t = accountTotal(account);
-    if (!t) continue;
+    if (!t) {
+      missing += 1;
+      continue;
+    }
     count += 1;
     totals.set(t.currency, (totals.get(t.currency) ?? 0) + t.amount);
   }
   const byCurrency = [...totals.entries()]
     .map(([currency, amount]) => ({ currency, amount }))
     .sort((a, b) => b.amount - a.amount);
-  return { byCurrency, primary: byCurrency[0] ?? null, accountCount: count };
+  return { byCurrency, primary: byCurrency[0] ?? null, accountCount: count, missing };
 }
 
 export interface DayChange extends CurrencyTotal {

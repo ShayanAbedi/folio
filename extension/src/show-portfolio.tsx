@@ -58,7 +58,16 @@ export default function ShowPortfolio() {
         <ListEmpty kind="connect" onRetry={refresh} />
       ) : (
         <>
-          <List.Section title="Net Worth" subtitle={updated}>
+          <List.Section
+            title="Net Worth"
+            subtitle={[
+              updated,
+              // Here, not on a total's row, so it shows even when no account has a balance yet.
+              nw.missing ? `${nw.missing} account${nw.missing === 1 ? "" : "s"} without a balance, not included` : "",
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          >
             {nw.byCurrency.map((t, i) => (
               <List.Item
                 key={t.currency}
