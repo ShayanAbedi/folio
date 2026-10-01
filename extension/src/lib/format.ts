@@ -88,6 +88,18 @@ export function formatAsOf(iso: string | null | undefined, now: Date = new Date(
   return `${date}, ${time}`;
 }
 
+/** "Sep 28" for a YYYY-MM-DD snapshot date, read as a calendar date (not shifted by time zone). */
+export function formatSnapshotDate(date: string): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return date;
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}
+
+/** The period a balance-history change covers: "Sep 27 → Sep 28", or "to Sep 28" if the start is unknown. */
+export function formatSnapshotPeriod(c: { asOf: string; from?: string }): string {
+  return c.from ? `${formatSnapshotDate(c.from)} → ${formatSnapshotDate(c.asOf)}` : `to ${formatSnapshotDate(c.asOf)}`;
+}
+
 export function formatRelativeDays(days: number | null): string {
   if (days === null) return "—";
   if (days === 0) return "today";

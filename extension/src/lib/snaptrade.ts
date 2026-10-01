@@ -33,11 +33,19 @@ export function getAccountPositions(
   });
 }
 
+/**
+ * Balance history and activities are never live: SnapTrade serves them from its own store, which
+ * changes only at its nightly sync or when a brokerage is (re)connected. Fetching them more often
+ * returns the same data and uses up the account's rate limit, so they're cached for an hour. ⌘R
+ * (and refreshing in Connect Brokerage) clears the cache.
+ */
+const STORED_DATA_TTL_MS = 3_600_000;
+
 export async function getBalanceHistory(accountId: string, fresh = false): Promise<AccountValueHistoryResponse | null> {
   try {
     return await snaptrade<AccountValueHistoryResponse>(`/accounts/${encodeURIComponent(accountId)}/balanceHistory`, {
       fresh,
-      ttlMs: 120_000,
+      ttlMs: STORED_DATA_TTL_MS,
     });
   } catch {
     // Optional on some plans/brokerages. Missing history just means "no day change", never a fake one.
@@ -58,7 +66,7 @@ export async function getAccountActivities(
     const res = await snaptrade<PaginatedActivities>(`/accounts/${encodeURIComponent(accountId)}/activities`, {
       query: { startDate, endDate, offset, limit },
       fresh,
-      ttlMs: 120_000,
+      ttlMs: STORED_DATA_TTL_MS,
     });
     const data = res.data ?? [];
     out.push(...data);

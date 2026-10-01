@@ -76,7 +76,12 @@ function dayChangeFrom(history: AccountValueHistoryResponse | null, currency: st
   if (points.length < 2 || !currency) return undefined;
   const last = points[points.length - 1];
   const prev = points[points.length - 2];
-  return { amount: Number(last.total_value) - Number(prev.total_value), currency, asOf: last.date! };
+  return {
+    amount: Number(last.total_value) - Number(prev.total_value),
+    currency,
+    asOf: last.date!,
+    from: prev.date!,
+  };
 }
 
 /**
@@ -122,6 +127,7 @@ async function snapshotFor(
     holdings,
     dayChange: dayChangeFrom(await history, currency),
     fetchedAt: oldest([balancesMeta.fetchedAt, positionsMeta.fetchedAt]) ?? new Date().toISOString(),
+    dataAsOf: positions.data_freshness?.as_of,
   };
 }
 

@@ -14,11 +14,31 @@ export interface LastGood {
   holdings: AccountSnapshot["holdings"];
   /** When those holdings were fetched (ISO). */
   fetchedAt: string;
+  /** How current SnapTrade's data was at that fetch (ISO), if it said. */
+  dataAsOf?: string;
 }
 
 export function toLastGood(s: AccountSnapshot): LastGood | undefined {
   if (s.stale || !s.fetchedAt) return undefined;
-  return { holdings: s.holdings, fetchedAt: s.fetchedAt };
+  return { holdings: s.holdings, fetchedAt: s.fetchedAt, dataAsOf: s.dataAsOf };
+}
+
+/** Parses an ISO time, reading one without a zone as UTC (not the Mac's local time). */
+function parseUtc(iso: string): number {
+  return Date.parse(/(Z|[+-]\d{2}:?\d{2})$/i.test(iso) || !iso.includes("T") ? iso : `${iso}Z`);
+}
+
+/** Brokerage data more than this far behind the fetch is labelled with its own time. */
+export const OLD_DATA_MS = 60 * 60_000;
+
+/**
+ * SnapTrade's own data time for an account when it's well behind when Folio fetched it (some
+ * brokerages aren't live), so the UI can say "data from …" instead of implying it's current.
+ */
+export function oldDataAsOf(s: Pick<AccountSnapshot, "dataAsOf" | "fetchedAt">): string | undefined {
+  if (!s.dataAsOf || !s.fetchedAt) return undefined;
+  const behind = Date.parse(s.fetchedAt) - parseUtc(s.dataAsOf);
+  return behind > OLD_DATA_MS ? s.dataAsOf : undefined;
 }
 
 function describe(e: unknown): string {
@@ -71,6 +91,7 @@ export function assembleAccounts(
         holdings: { ...prev.holdings, account },
         dayChange: partial?.dayChange,
         fetchedAt: prev.fetchedAt,
+        dataAsOf: prev.dataAsOf,
         stale: { asOf: prev.fetchedAt, message },
       });
     } else {

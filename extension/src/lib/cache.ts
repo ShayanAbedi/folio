@@ -31,8 +31,19 @@ export function cacheSet<T>(key: string, value: T): void {
   cache.set(key, JSON.stringify({ at: Date.now(), value } satisfies Entry<T>));
 }
 
-/** Clears the HTTP cache and Raycast's default cache namespace (where useCachedPromise keeps rendered data). */
+let generation = 0;
+
+/**
+ * Bumped by every cacheClear(). A request that started before a clear (⌘R) must neither be joined by
+ * requests made after it nor write its older response back into the cache.
+ */
+export function cacheGeneration(): number {
+  return generation;
+}
+
+/** Clears the HTTP cache and Raycast's default cache namespace. */
 export function cacheClear(): void {
+  generation += 1;
   cache.clear();
   new Cache().clear();
 }

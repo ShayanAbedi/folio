@@ -4,6 +4,7 @@ import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, fogIdleLabel, quietStreak } from "./lib/portfolio";
 import { formatAsOf, formatDate, formatMoney, formatMoneyWithCode, formatRelativeDays, mask } from "./lib/format";
+import { oldDataAsOf } from "./lib/snapshot";
 import { NavigationActions, PrivacyAction, RefreshAction, TradeStubAction } from "./components/actions";
 import { classifyError, DetailEmpty } from "./components/empty";
 
@@ -75,6 +76,13 @@ export default function ShowFog() {
       "",
       `> ⚠️ Excluded because they couldn't be loaded: ${names.join(", ")}. Cash and streaks above don't include them.`,
     );
+  }
+  const behind = portfolio.snapshot.accounts.flatMap((s) => {
+    const old = s.stale ? undefined : oldDataAsOf(s);
+    return old ? [`${s.account.institution_name} · ${s.account.name ?? s.account.number} (${formatAsOf(old)})`] : [];
+  });
+  if (behind.length > 0) {
+    md.push("", `> 🕒 SnapTrade's latest data for these accounts isn't current: ${behind.join(", ")}.`);
   }
   const stale = portfolio.snapshot.accounts.filter((s) => s.stale);
   if (stale.length > 0) {

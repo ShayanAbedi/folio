@@ -8,6 +8,12 @@
 - The Menu Bar lists accounts that couldn't be loaded at all, instead of leaving them out silently
 - "Updated" time in the Menu Bar and Show Portfolio, and a note when a refresh failed and older data is shown
 - At most two balance and position requests at a time per brokerage connection, so brokerages are less likely to rate-limit Folio
+- Fewer requests: identical requests that run at the same time are sent once, and activities and balance history (which SnapTrade only updates at its nightly sync) are cached for an hour. ⌘R still fetches everything fresh
+- A clear message when SnapTrade's per-account rate limit is reached, with when to try again
+- Accounts whose data SnapTrade hasn't updated recently (for example Wealthsimple) show how old it is: "data from …"
+- The day change only adds up accounts whose balance snapshots cover the same dates, shows those dates, and stays out of the Menu Bar title when it isn't recent
+- Internal cash transfers between accounts now show under Deposits and count as new cash in Fog
+- ⌘R inside an account's holdings now updates the holdings shown
 
 ## [Initial Version] - 2026-09-29
 

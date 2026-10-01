@@ -2,8 +2,9 @@ import { Color, Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@
 import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
 import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
-import { computeFog, dayChange, fogIdleLabel, groupByInstitution, netWorth } from "./lib/portfolio";
-import { formatAsOf, formatMoney, formatMoneyWithCode, MASK, mask } from "./lib/format";
+import { computeFog, dayChange, fogIdleLabel, groupByInstitution, isRecentSnapshot, netWorth } from "./lib/portfolio";
+import { formatAsOf, formatMoney, formatMoneyWithCode, formatSnapshotPeriod, MASK, mask } from "./lib/format";
+import { oldDataAsOf } from "./lib/snapshot";
 import { classifyError } from "./components/empty";
 import { launch } from "./components/actions";
 
@@ -31,9 +32,16 @@ export default function MenuBarPortfolio() {
             ? "Sign in"
             : "—";
   // Title layout: "<net worth> · ▲ <change>". The arrow glyph sits next to the number it describes; the icon stays neutral.
-  // A partial sum (some accounts have no balance history) never goes in the title.
+  // Only a complete, recent change goes in the title: never a partial sum (accounts without history or
+  // with snapshots on other dates), and never an old one passed off as today's.
   const delta =
-    privacy || !primaryChange || !primaryChange.complete || primaryChange.amount === 0 ? null : primaryChange.amount;
+    privacy ||
+    !primaryChange ||
+    !primaryChange.complete ||
+    !isRecentSnapshot(primaryChange.asOf, new Date()) ||
+    primaryChange.amount === 0
+      ? null
+      : primaryChange.amount;
   const deltaText =
     delta === null
       ? ""
@@ -56,7 +64,7 @@ export default function MenuBarPortfolio() {
     <MenuBarExtra
       icon={icon}
       title={titleWithChange}
-      tooltip="Folio · net worth. The arrow is the change vs the previous SnapTrade balance snapshot and includes deposits."
+      tooltip="Folio · net worth. The arrow is the change between the last two SnapTrade balance snapshots (including deposits), shown only when every account has one for the same recent dates."
       isLoading={isLoading || acts.isLoading}
     >
       {error && accounts.length === 0 ? (
@@ -87,7 +95,7 @@ export default function MenuBarPortfolio() {
                   subtitle={
                     c
                       ? mask(
-                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot${c.complete ? "" : ` (${c.covered} of ${c.covered + c.missing} accounts)`}`,
+                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} ${formatSnapshotPeriod(c)}${c.complete ? "" : ` (${c.covered} of ${c.covered + c.missing + c.otherDates} accounts)`}`,
                           privacy,
                         )
                       : undefined
@@ -99,23 +107,40 @@ export default function MenuBarPortfolio() {
           </MenuBarExtra.Section>
           {groupByInstitution(accounts).map((g) => (
             <MenuBarExtra.Section key={g.institution} title={g.institution}>
-              {g.items.map((s) => (
-                <MenuBarExtra.Item
-                  key={s.account.id}
-                  icon={s.stale ? { source: Icon.Warning, tintColor: Color.Orange } : undefined}
-                  title={s.account.name ?? s.account.number}
-                  subtitle={`${mask(
-                    formatMoneyWithCode(s.account.balance.total?.amount, s.account.balance.total?.currency),
-                    privacy,
-                  )}${s.stale ? ` · holdings as of ${formatAsOf(s.stale.asOf)}` : ""}`}
-                  tooltip={
-                    s.stale
-                      ? `Couldn't refresh this account's holdings (${s.stale.message}). Showing the last ones loaded, from ${formatAsOf(s.stale.asOf)}.`
-                      : undefined
-                  }
-                  onAction={() => launch("show-portfolio")}
-                />
-              ))}
+              {g.items.map((s) => {
+                const oldData = s.stale ? undefined : oldDataAsOf(s);
+                return (
+                  <MenuBarExtra.Item
+                    key={s.account.id}
+                    icon={
+                      s.stale
+                        ? { source: Icon.Warning, tintColor: Color.Orange }
+                        : oldData
+                          ? { source: Icon.Clock, tintColor: Color.SecondaryText }
+                          : undefined
+                    }
+                    title={s.account.name ?? s.account.number}
+                    subtitle={`${mask(
+                      formatMoneyWithCode(s.account.balance.total?.amount, s.account.balance.total?.currency),
+                      privacy,
+                    )}${
+                      s.stale
+                        ? ` · holdings as of ${formatAsOf(s.stale.asOf)}`
+                        : oldData
+                          ? ` · data from ${formatAsOf(oldData)}`
+                          : ""
+                    }`}
+                    tooltip={
+                      s.stale
+                        ? `Couldn't refresh this account's holdings (${s.stale.message}). Showing the last ones loaded, from ${formatAsOf(s.stale.asOf)}.`
+                        : oldData
+                          ? `SnapTrade's latest data for this account is from ${formatAsOf(oldData)}; it isn't being updated live.`
+                          : undefined
+                    }
+                    onAction={() => launch("show-portfolio")}
+                  />
+                );
+              })}
             </MenuBarExtra.Section>
           ))}
           {failures.length > 0 && (

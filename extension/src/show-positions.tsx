@@ -3,6 +3,7 @@ import { useState } from "react";
 import { usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { flattenPositions, searchPositions } from "./lib/portfolio";
+import { oldDataAsOf } from "./lib/snapshot";
 import { classifyError, ListEmpty } from "./components/empty";
 import { PositionItem } from "./components/PositionItem";
 
@@ -19,9 +20,14 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
   const { privacy, ready, toggle } = usePrivacy();
   const all = snapshot ? flattenPositions(snapshot.accounts) : [];
   const matches = searchPositions(all, query);
-  const staleAsOf = new Map(
-    (snapshot?.accounts ?? []).flatMap((s) => (s.stale ? [[s.account.id, s.stale.asOf] as const] : [])),
-  );
+  // Accounts whose positions aren't current: couldn't be refreshed, or the brokerage's data is behind.
+  const asOf = new Map<string, { at: string; stale: boolean }>();
+  for (const s of snapshot?.accounts ?? []) {
+    const old = s.stale ? undefined : oldDataAsOf(s);
+    if (s.stale) asOf.set(s.account.id, { at: s.stale.asOf, stale: true });
+    else if (old) asOf.set(s.account.id, { at: old, stale: false });
+  }
+  const notRefreshed = [...asOf.values()].filter((a) => a.stale).length;
 
   return (
     <List
@@ -45,8 +51,8 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
         <List.Section
           title={query ? `Matches for ${query.toUpperCase()}` : "Positions"}
           subtitle={
-            staleAsOf.size > 0
-              ? `${matches.length} · ${staleAsOf.size} account${staleAsOf.size === 1 ? "" : "s"} not refreshed`
+            notRefreshed > 0
+              ? `${matches.length} · ${notRefreshed} account${notRefreshed === 1 ? "" : "s"} not refreshed`
               : `${matches.length}`
           }
         >
@@ -59,7 +65,7 @@ export default function ShowPositions(props: LaunchProps<{ arguments: { ticker?:
               onToggleDetail={() => setShowDetail((v) => !v)}
               onTogglePrivacy={toggle}
               onRefresh={refresh}
-              staleAsOf={staleAsOf.get(p.accountId)}
+              asOf={asOf.get(p.accountId)}
             />
           ))}
         </List.Section>

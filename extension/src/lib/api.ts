@@ -7,7 +7,20 @@
 import { SNAPTRADE_API_BASE } from "./discovery";
 import { AuthError, getAccessToken } from "./auth";
 import { authMode } from "./preferences";
-import { cacheGetEntry, cacheSet } from "./cache";
+import { cacheGeneration, cacheGetEntry, cacheSet } from "./cache";
+import { inFlight } from "./inflight";
+import { rateLimitMessage } from "./rate-limit";
+
+/** Identifies Folio in SnapTrade's request logs. */
+const USER_AGENT = "Folio (Raycast extension; +https://github.com/ShayanAbedi/folio)";
+
+/**
+ * Concurrent identical GETs share one request. Several views load at once (the Menu Bar loads the
+ * portfolio and activities together, both starting with /accounts), and SnapTrade rate-limits each
+ * account, so a duplicate costs quota as well as time. A shared request is already in flight, so
+ * its data is never older than starting a new one.
+ */
+const sharedGet = inFlight<{ data: unknown; at: number }>();
 
 export class ApiError extends Error {
   constructor(
@@ -45,16 +58,18 @@ function buildUrl(path: string, query?: RequestOptions["query"]): string {
   return url.toString();
 }
 
+/** One HTTP attempt. */
 async function once<T>(
   url: string,
   opts: RequestOptions,
   token: string,
-): Promise<{ status: number; data: T | undefined; raw: string }> {
+): Promise<{ status: number; data: T | undefined; raw: string; headers: Headers }> {
   const res = await fetch(url, {
     method: opts.method ?? "GET",
     headers: {
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
+      "User-Agent": USER_AGENT,
       ...(opts.body !== undefined ? { "Content-Type": "application/json" } : {}),
     },
     body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
@@ -66,7 +81,7 @@ async function once<T>(
   } catch {
     data = undefined;
   }
-  return { status: res.status, data, raw };
+  return { status: res.status, data, raw, headers: res.headers };
 }
 
 export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Promise<T> {
@@ -81,7 +96,19 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
       return hit.value;
     }
   }
+  if (method !== "GET") return request<T>(url, path, method, opts);
+  const generation = cacheGeneration();
+  const { data, at } = await sharedGet(`${generation}:${cacheKey}`, async () => {
+    const value = await request<T>(url, path, method, opts);
+    // Don't put a response from before a ⌘R back into the cache it cleared.
+    if (ttl !== 0 && generation === cacheGeneration()) cacheSet(cacheKey, value);
+    return { data: value, at: Date.now() };
+  });
+  if (opts.meta) opts.meta.fetchedAt = at;
+  return data as T;
+}
 
+async function request<T>(url: string, path: string, method: string, opts: RequestOptions): Promise<T> {
   let token = await getAccessToken();
   let result = await once<T>(url, opts, token);
   if (result.status === 401) {
@@ -91,6 +118,13 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
   }
   if (result.status === 401) {
     throw new AuthError("SnapTrade rejected the session. Sign in again.", "signed-out");
+  }
+  if (result.status === 429) {
+    throw new ApiError(
+      rateLimitMessage((name) => result.headers.get(name)),
+      429,
+      result.data,
+    );
   }
   if (result.status < 200 || result.status >= 300) {
     const detail =
@@ -103,7 +137,5 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
       result.data,
     );
   }
-  if (method === "GET" && ttl !== 0) cacheSet(cacheKey, result.data);
-  if (opts.meta) opts.meta.fetchedAt = Date.now();
   return result.data as T;
 }

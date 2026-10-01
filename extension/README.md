@@ -16,7 +16,7 @@ Folio never places trades or moves money. SnapTrade OAuth apps are read-only by 
 | Connect Brokerage | Read-only SnapTrade Connection Portal and connection status |
 | Menu Bar Portfolio | Net worth in the menu bar, per-account totals, Fog |
 
-Everywhere: **⌘⇧P** hides balances (privacy mode), **⌘R** refreshes past the 60–120 s cache, **⌘I** toggles position details.
+Everywhere: **⌘⇧P** hides balances (privacy mode), **⌘R** refreshes past the cache (90–120 s for balances, positions and account totals; 1 hour for activities and balance history, which SnapTrade only updates at its nightly sync), **⌘I** toggles position details.
 
 ## Using Folio
 
@@ -36,7 +36,7 @@ Nothing to paste. You'll need a [SnapTrade account](https://dashboard.snaptrade.
 
 ## How Fog is computed
 
-Fog is cash that isn't doing anything. The amount is the sum of cash balances across accounts (per currency). The idle days are counted from the later of your last buy and your last deposit within the activity window. If neither happened inside the window, Folio reports "365+" rather than guessing. It understates on purpose.
+Fog is cash that isn't doing anything. The amount is the sum of cash balances across accounts (per currency). The idle days are counted from the later of your last buy and your last deposit (or cash transferred in from another account) within the activity window. If neither happened inside the window, Folio reports "365+" rather than guessing. It understates on purpose.
 
 ## Security notes
 

@@ -54,7 +54,7 @@ Everywhere: **⌘⇧P** hides every balance (privacy mode), **⌘R** refreshes, 
 
 ## What Fog means
 
-Fog is cash that isn't doing anything. The amount is your cash balance across accounts. The idle days are counted from the later of your last buy and your last deposit. If neither happened in the last 365 days, Folio says "365+" rather than guessing. It understates on purpose.
+Fog is cash that isn't doing anything. The amount is your cash balance across accounts. The idle days are counted from the later of your last buy and your last deposit (or cash transferred in from another account). If neither happened in the last 365 days, Folio says "365+" rather than guessing. It understates on purpose.
 
 ## Privacy and security
 

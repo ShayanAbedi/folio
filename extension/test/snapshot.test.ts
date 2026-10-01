@@ -1,7 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { assembleAccounts, HoldingsRefreshError, oldest, toLastGood, type LastGood } from "../src/lib/snapshot.ts";
-import { formatAsOf } from "../src/lib/format.ts";
+import {
+  assembleAccounts,
+  HoldingsRefreshError,
+  oldDataAsOf,
+  oldest,
+  toLastGood,
+  type LastGood,
+} from "../src/lib/snapshot.ts";
+import { formatAsOf, formatSnapshotDate, formatSnapshotPeriod } from "../src/lib/format.ts";
 import { dayChange, netWorth } from "../src/lib/portfolio.ts";
 import { AuthError } from "../src/lib/auth-error.ts";
 import { FIXTURE_ACCOUNTS, fixtureHoldings } from "../src/fixtures/index.ts";
@@ -131,7 +138,7 @@ test("only fresh snapshots are saved as the fallback, without their day change",
     dayChange: { amount: 5, currency: "CAD", asOf: "2026-09-29" },
     fetchedAt: "2026-09-30T14:40:00.000Z",
   };
-  assert.deepEqual(toLastGood(fresh), { holdings: {}, fetchedAt: fresh.fetchedAt });
+  assert.deepEqual(toLastGood(fresh), { holdings: {}, fetchedAt: fresh.fetchedAt, dataAsOf: undefined });
   assert.equal(toLastGood({ ...fresh, stale: { asOf: fresh.fetchedAt!, message: "x" } }), undefined);
   assert.equal(toLastGood({ account: a, holdings: {} }), undefined);
 });
@@ -150,4 +157,32 @@ test("formatAsOf shows the time today and the date otherwise", () => {
   assert.equal(formatAsOf(new Date(2026, 8, 29, 22, 5).toISOString(), now), "Sep 29, 10:05 PM");
   assert.equal(formatAsOf(new Date(2025, 11, 31, 9, 0).toISOString(), now), "Dec 31, 2025, 9:00 AM");
   assert.equal(formatAsOf(undefined, now), "—");
+});
+
+test("oldDataAsOf flags brokerage data more than an hour behind the fetch", () => {
+  const fetchedAt = "2026-10-01T00:51:22.000Z";
+  // Wealthsimple in the logs: positions data_freshness ~21 h before the request.
+  assert.equal(oldDataAsOf({ fetchedAt, dataAsOf: "2026-09-30T03:49:38Z" }), "2026-09-30T03:49:38Z");
+  // Webull: live.
+  assert.equal(oldDataAsOf({ fetchedAt, dataAsOf: "2026-10-01T00:51:18Z" }), undefined);
+  assert.equal(oldDataAsOf({ fetchedAt }), undefined);
+  // No time zone: read as UTC, not the Mac's local time.
+  assert.equal(oldDataAsOf({ fetchedAt, dataAsOf: "2026-10-01T00:51:18" }), undefined);
+});
+
+test("a stale account keeps the data time of its fallback copy", () => {
+  const prev: LastGood = {
+    holdings: fixtureHoldings(b.id),
+    fetchedAt: "2026-09-30T14:25:00.000Z",
+    dataAsOf: "2026-09-30T03:49:38Z",
+  };
+  const { snapshots } = assembleAccounts([a, b], [ok(a), fail(new Error("429"))], () => prev, isFatal);
+  assert.equal(snapshots[1].dataAsOf, prev.dataAsOf);
+  assert.equal(toLastGood({ account: a, holdings: {}, fetchedAt: "x", dataAsOf: "y" })?.dataAsOf, "y");
+});
+
+test("snapshot dates format as calendar dates in any time zone", () => {
+  assert.equal(formatSnapshotDate("2026-09-28"), "Sep 28");
+  assert.equal(formatSnapshotPeriod({ from: "2026-09-29", asOf: "2026-10-01" }), "Sep 29 → Oct 1");
+  assert.equal(formatSnapshotPeriod({ asOf: "2026-10-01" }), "to Oct 1");
 });

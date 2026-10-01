@@ -188,10 +188,18 @@ export interface AccountValueHistoryResponse {
 export interface AccountSnapshot {
   account: Account;
   holdings: AccountHoldings;
-  /** Present only when the balance-history endpoint returned at least two points. */
-  dayChange?: { amount: number; currency: string; asOf: string };
+  /**
+   * Present only when the balance-history endpoint returned at least two points: the change between
+   * its last two snapshots, dated `from` → `asOf` (YYYY-MM-DD). Not always one day apart.
+   */
+  dayChange?: { amount: number; currency: string; asOf: string; from?: string };
   /** When balances and positions were fetched from SnapTrade (ISO; the older of the two). */
   fetchedAt?: string;
+  /**
+   * How current SnapTrade's own data for this account is (positions `data_freshness.as_of`, ISO).
+   * Not always current: Wealthsimple accounts, for example, were seen ~21 h behind `fetchedAt`.
+   */
+  dataAsOf?: string;
   /**
    * Set when this account's latest refresh failed and `holdings` is the last good copy from `asOf`.
    * The account record (and so its total) is still the current one from /accounts.

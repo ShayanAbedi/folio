@@ -4,14 +4,19 @@ import { cacheClear } from "./cache";
 import { ACTIVITY_WINDOW_DAYS, loadActivities, loadConnections, loadPortfolio } from "./data";
 import { authMode } from "./preferences";
 
-/** Portfolio snapshot with Raycast-level caching (instant paint) plus our HTTP TTL cache. */
-export function usePortfolio() {
+/**
+ * Portfolio snapshot with Raycast-level caching (instant paint) plus our HTTP TTL cache.
+ * `load: false` reads the snapshot another view already loaded without starting a load of its own
+ * (a pushed view in the same command); `refresh` still reloads.
+ */
+export function usePortfolio(opts?: { load?: boolean }) {
   const mode = authMode();
   const { data, isLoading, error, revalidate } = useCachedPromise(
     (m: string) => loadPortfolio(false).then((s) => ({ ...s, mode: m })),
     [mode],
     {
       keepPreviousData: true,
+      execute: opts?.load ?? true,
     },
   );
   const refresh = useCallback(async () => {
