@@ -1,9 +1,9 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "name": "fathom",
-  "title": "Fathom",
-  "description": "Your portfolio in Raycast. Net worth, holdings, activities and idle cash from every brokerage connected to SnapTrade. Read-only.",
-  "icon": "icon.png",
+  "name": "folio",
+  "title": "Folio",
+  "description": "Net worth, holdings, activities and idle cash from every brokerage connected to SnapTrade, read-only.",
+  "icon": "folio.png",
   "author": "shayan_abedi",
   "categories": [
     "Finance"
@@ -24,20 +24,19 @@
   "commands": [
     {
       "name": "sign-in",
-      "title": "Sign in with SnapTrade",
-      "subtitle": "Fathom",
+      "title": "Sign In with SnapTrade",
       "description": "Sign in to SnapTrade with OAuth (read-only) or sign out.",
       "mode": "view",
       "keywords": [
         "login",
         "logout",
-        "oauth"
+        "oauth",
+        "snaptrade"
       ]
     },
     {
       "name": "show-portfolio",
       "title": "Show Portfolio",
-      "subtitle": "Fathom",
       "description": "Net worth and accounts grouped by institution, with holdings per account.",
       "mode": "view",
       "keywords": [
@@ -49,19 +48,28 @@
     {
       "name": "show-positions",
       "title": "Show Positions",
-      "subtitle": "Fathom",
-      "description": "Every position across all accounts in one searchable list.",
+      "description": "Every position across all accounts in one searchable list. Pass a ticker to jump straight to it.",
       "mode": "view",
       "keywords": [
         "holdings",
         "stocks",
-        "etf"
+        "etf",
+        "ticker",
+        "symbol",
+        "search"
+      ],
+      "arguments": [
+        {
+          "name": "ticker",
+          "placeholder": "Ticker",
+          "type": "text",
+          "required": false
+        }
       ]
     },
     {
       "name": "show-fog",
       "title": "Show Fog",
-      "subtitle": "Fathom",
       "description": "How much cash is sitting idle and for how long.",
       "mode": "view",
       "keywords": [
@@ -73,7 +81,6 @@
     {
       "name": "show-activities",
       "title": "Show Activities",
-      "subtitle": "Fathom",
       "description": "Trades, dividends and deposits across all accounts.",
       "mode": "view",
       "keywords": [
@@ -86,7 +93,6 @@
     {
       "name": "connect-brokerage",
       "title": "Connect Brokerage",
-      "subtitle": "Fathom",
       "description": "Open the SnapTrade Connection Portal to link a brokerage (read-only) and review existing connections.",
       "mode": "view",
       "keywords": [
@@ -96,28 +102,8 @@
       ]
     },
     {
-      "name": "search-position",
-      "title": "Search Position",
-      "subtitle": "Fathom",
-      "description": "Look up a ticker across all your accounts.",
-      "mode": "view",
-      "keywords": [
-        "ticker",
-        "symbol"
-      ],
-      "arguments": [
-        {
-          "name": "ticker",
-          "placeholder": "Ticker",
-          "type": "text",
-          "required": false
-        }
-      ]
-    },
-    {
       "name": "menu-bar-portfolio",
       "title": "Menu Bar Portfolio",
-      "subtitle": "Fathom",
       "description": "Net worth in the menu bar, with per-account totals and idle cash.",
       "mode": "menu-bar",
       "interval": "15m",
@@ -131,11 +117,11 @@
     {
       "name": "authWorkerUrl",
       "title": "Auth Worker URL",
-      "description": "URL of the deployed Fathom auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
+      "description": "URL of the deployed Folio auth worker that exchanges and refreshes SnapTrade OAuth tokens. The client secret lives there, never in Raycast.",
       "type": "textfield",
       "required": false,
-      "default": "https://fathom-auth.example.workers.dev",
-      "placeholder": "https://fathom-auth.<your-subdomain>.workers.dev"
+      "default": "https://folio-auth.shayanabedi-dev.workers.dev",
+      "placeholder": "https://folio-auth.<your-subdomain>.workers.dev"
     },
     {
       "name": "oauthClientId",
@@ -143,34 +129,17 @@
       "description": "Public client_id of the SnapTrade OAuth app registered by the maintainer. Not a secret.",
       "type": "textfield",
       "required": false,
-      "default": "",
+      "default": "FOLIO-YVIID",
       "placeholder": "snaptrade-oauth-client-id"
     },
     {
       "name": "useFixtures",
       "title": "Data Source",
       "label": "Use bundled fixture data (demo mode)",
-      "description": "Render sample Wealthsimple, Questrade and IBKR accounts instead of calling SnapTrade. Useful for screenshots and development.",
+      "description": "Render sample Wealthsimple, Questrade and IBKR accounts instead of calling SnapTrade. Lets you try Folio without signing in.",
       "type": "checkbox",
       "required": false,
       "default": false
-    },
-    {
-      "name": "enableDevPersonalKey",
-      "title": "Developer",
-      "label": "Use a SnapTrade Personal API key instead of OAuth (developers only)",
-      "description": "Bypass OAuth with your own SnapTrade Personal API key. For extension development only, not for Store users.",
-      "type": "checkbox",
-      "required": false,
-      "default": false
-    },
-    {
-      "name": "devPersonalApiKey",
-      "title": "Personal API Key (dev)",
-      "description": "Only used when the developer checkbox above is enabled. Stored by Raycast, never written to disk by Fathom.",
-      "type": "password",
-      "required": false,
-      "placeholder": "st-personal-..."
     }
   ],
   "dependencies": {

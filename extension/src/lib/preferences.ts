@@ -1,29 +1,19 @@
 import { getPreferenceValues } from "@raycast/api";
 
-export interface FathomPreferences {
-  authWorkerUrl: string;
-  oauthClientId: string;
-  useFixtures: boolean;
-  enableDevPersonalKey: boolean;
-  devPersonalApiKey?: string;
-}
-
-export function prefs(): FathomPreferences {
-  const p = getPreferenceValues<FathomPreferences>();
+/** Normalized view of the manifest preferences. The shape comes from Raycast's generated `Preferences` type. */
+export function prefs() {
+  const p = getPreferenceValues<Preferences>();
   return {
     authWorkerUrl: (p.authWorkerUrl ?? "").trim().replace(/\/+$/, ""),
     oauthClientId: (p.oauthClientId ?? "").trim(),
     useFixtures: Boolean(p.useFixtures),
-    enableDevPersonalKey: Boolean(p.enableDevPersonalKey),
-    devPersonalApiKey: p.devPersonalApiKey?.trim() || undefined,
   };
 }
 
-export type AuthMode = "fixtures" | "dev-personal-key" | "oauth";
+export type FolioPreferences = ReturnType<typeof prefs>;
+
+export type AuthMode = "fixtures" | "oauth";
 
 export function authMode(): AuthMode {
-  const p = prefs();
-  if (p.useFixtures) return "fixtures";
-  if (p.enableDevPersonalKey && p.devPersonalApiKey) return "dev-personal-key";
-  return "oauth";
+  return prefs().useFixtures ? "fixtures" : "oauth";
 }

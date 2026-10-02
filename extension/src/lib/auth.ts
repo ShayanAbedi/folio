@@ -3,7 +3,7 @@
  *
  * SnapTrade Dashboard OAuth apps are confidential clients: the token, refresh and revoke calls need
  * HTTP Basic client_id:client_secret on top of PKCE. The secret can never ship inside an extension,
- * so those three calls go through the Fathom auth worker (see /auth-worker). Everything else —
+ * so those three calls go through the Folio auth worker (see /auth-worker). Everything else —
  * building the authorization URL, PKCE, the callback, token storage — happens here with Raycast's
  * OAuth.PKCEClient. Data requests go straight to SnapTrade with `Authorization: Bearer`.
  */
@@ -26,9 +26,9 @@ export class AuthError extends Error {
 export const client = new OAuth.PKCEClient({
   redirectMethod: OAuth.RedirectMethod.Web,
   providerName: "SnapTrade",
-  providerIcon: "snaptrade.png",
+  providerIcon: "folio.png",
   providerId: "snaptrade",
-  description: "Fathom reads your portfolio through SnapTrade. Read-only: it can never place trades or move money.",
+  description: "Folio reads your portfolio through SnapTrade. Read-only: it can never place trades or move money.",
 });
 
 interface WorkerTokenResponse {
@@ -42,7 +42,9 @@ interface WorkerTokenResponse {
 
 function workerUrl(path: string): string {
   const base = prefs().authWorkerUrl;
-  if (!base || !/^https:\/\//.test(base) || base.includes("example.workers.dev")) {
+  // https only, except a local wrangler dev server.
+  const local = /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(base);
+  if (!base || (!/^https:\/\//.test(base) && !local) || base.includes("example.workers.dev")) {
     throw new AuthError("Auth Worker URL is not configured. Open the extension preferences.", "not-configured");
   }
   return `${base}${path}`;
@@ -143,17 +145,33 @@ export async function isSignedIn(): Promise<boolean> {
   return Boolean(tokens?.accessToken);
 }
 
-/** Revokes the refresh token (and access token as a hint) through the worker, then forgets both. */
-export async function signOut(): Promise<void> {
+export interface SignOutResult {
+  /** True if SnapTrade confirmed the revocation (or there was nothing to revoke). */
+  revoked: boolean;
+  /** Why revocation failed, when it did. Local tokens are removed regardless. */
+  error?: string;
+}
+
+/**
+ * Revokes the refresh token through the worker (one retry), then removes both tokens locally.
+ * Local sign-out always completes; the result says whether SnapTrade actually revoked the session
+ * so the UI can tell the truth instead of claiming a revoke that didn't happen.
+ */
+export async function signOut(): Promise<SignOutResult> {
   const tokens = await client.getTokens();
-  if (tokens?.refreshToken) {
+  let revoked = !tokens?.refreshToken;
+  let error: string | undefined;
+  for (let attempt = 0; tokens?.refreshToken && !revoked && attempt < 2; attempt += 1) {
     try {
       await workerPost("/oauth/revoke", { token: tokens.refreshToken, token_type_hint: "refresh_token" });
-    } catch {
-      // Best effort: local sign-out must succeed even if the worker is unreachable.
+      revoked = true;
+    } catch (e) {
+      error = e instanceof Error ? e.message : String(e);
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 1000));
     }
   }
   await client.removeTokens();
+  return { revoked, error };
 }
 
 /** Display-only claims from the id_token. Not verified; never sent anywhere. */
@@ -182,7 +200,7 @@ export async function sessionInfo(): Promise<{
   return out;
 }
 
-/** The exact redirect URI Raycast uses; maintainers register this in the SnapTrade dashboard. */
+/** The exact redirect URI Raycast uses; maintainers register this in the SnapTrade dashboard. Development builds only. */
 export async function redirectUriForRegistration(): Promise<string> {
   const discovery = await getDiscovery();
   const request = await client.authorizationRequest({

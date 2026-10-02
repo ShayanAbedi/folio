@@ -1,11 +1,12 @@
 /**
- * Thin HTTP layer for SnapTrade with Bearer auth only.
- * Never sends clientId, consumerKey, userId, userSecret, timestamp or Signature.
- * On 401: refresh once through the worker and retry once; then surface a sign-in error.
+ * Thin HTTP layer for SnapTrade.
+ * OAuth mode (the Store build): Bearer auth only. Never sends clientId, consumerKey, userId,
+ * userSecret, timestamp or Signature. On 401: refresh once through the worker and retry once;
+ * then surface a sign-in error.
  */
 import { SNAPTRADE_API_BASE } from "./discovery";
 import { AuthError, getAccessToken } from "./auth";
-import { authMode, prefs } from "./preferences";
+import { authMode } from "./preferences";
 import { cacheGet, cacheSet } from "./cache";
 
 export class ApiError extends Error {
@@ -30,12 +31,6 @@ export interface RequestOptions {
 }
 
 async function bearer(force = false): Promise<string> {
-  const mode = authMode();
-  if (mode === "dev-personal-key") {
-    const key = prefs().devPersonalApiKey;
-    if (!key) throw new AuthError("Developer key enabled but empty.", "not-configured");
-    return key;
-  }
   return getAccessToken({ force });
 }
 
@@ -83,7 +78,7 @@ export async function snaptrade<T>(path: string, opts: RequestOptions = {}): Pro
 
   let token = await bearer();
   let result = await once<T>(url, opts, token);
-  if (result.status === 401 && authMode() === "oauth") {
+  if (result.status === 401) {
     token = await bearer(true); // refresh once
     result = await once<T>(url, opts, token); // retry once
   }

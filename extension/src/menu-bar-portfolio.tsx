@@ -1,9 +1,9 @@
-import { Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@raycast/api";
+import { Color, Icon, MenuBarExtra, openExtensionPreferences, Keyboard } from "@raycast/api";
 import { ACTIVITY_WINDOW_DAYS } from "./lib/data";
 import { useActivities, usePortfolio } from "./lib/hooks";
 import { usePrivacy } from "./lib/privacy";
 import { computeFog, dayChange, fogIdleLabel, groupByInstitution, netWorth } from "./lib/portfolio";
-import { formatMoney, formatMoneyWithCode, formatSigned, MASK, mask } from "./lib/format";
+import { formatMoney, formatMoneyWithCode, MASK, mask } from "./lib/format";
 import { classifyError } from "./components/empty";
 import { launch } from "./components/actions";
 
@@ -29,20 +29,28 @@ export default function MenuBarPortfolio() {
           : error
             ? "Sign in"
             : "—";
-  const titleWithChange =
-    privacy || !primaryChange ? title : `${title} ${formatSigned(primaryChange.amount, primaryChange.currency)}`;
+  // Title layout: "<net worth> · ▲ <change>". The arrow glyph sits next to the number it describes; the icon stays neutral.
+  // A partial sum (some accounts have no balance history) never goes in the title.
+  const delta =
+    privacy || !primaryChange || !primaryChange.complete || primaryChange.amount === 0 ? null : primaryChange.amount;
+  const deltaText =
+    delta === null
+      ? ""
+      : ` · ${delta > 0 ? "▲" : "▼"} ${formatMoney(Math.abs(delta), primaryChange!.currency, { compact: true })}`;
+  const titleWithChange = `${title}${deltaText}`;
+  const icon = Icon.Coins;
 
   return (
     <MenuBarExtra
-      icon={Icon.Coins}
+      icon={icon}
       title={titleWithChange}
-      tooltip="Fathom · net worth"
+      tooltip="Folio · net worth. The arrow is the change vs the previous SnapTrade balance snapshot and includes deposits."
       isLoading={isLoading || acts.isLoading}
     >
       {error && accounts.length === 0 ? (
-        <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Fathom"}>
+        <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Folio"}>
           <MenuBarExtra.Item
-            title={classifyError(error) === "sign-in" ? "Sign in with SnapTrade…" : "Open Preferences…"}
+            title={classifyError(error) === "sign-in" ? "Sign In with SnapTrade…" : "Open Preferences…"}
             onAction={() => (classifyError(error) === "sign-in" ? launch("sign-in") : openExtensionPreferences())}
           />
         </MenuBarExtra.Section>
@@ -51,11 +59,27 @@ export default function MenuBarPortfolio() {
           <MenuBarExtra.Section title="Net Worth">
             {nw.byCurrency.map((t) => {
               const c = change?.find((x) => x.currency === t.currency);
+              const up = (c?.amount ?? 0) >= 0;
               return (
                 <MenuBarExtra.Item
                   key={t.currency}
+                  icon={
+                    c && !privacy
+                      ? {
+                          source: up ? Icon.ArrowUpCircleFilled : Icon.ArrowDownCircleFilled,
+                          tintColor: up ? Color.Green : Color.Red,
+                        }
+                      : Icon.Coins
+                  }
                   title={mask(formatMoneyWithCode(t.amount, t.currency), privacy)}
-                  subtitle={c ? mask(`${formatSigned(c.amount, c.currency)} today`, privacy) : undefined}
+                  subtitle={
+                    c
+                      ? mask(
+                          `${up ? "▲" : "▼"} ${formatMoney(Math.abs(c.amount), c.currency)} vs previous snapshot${c.complete ? "" : ` (${c.covered} of ${c.covered + c.missing} accounts)`}`,
+                          privacy,
+                        )
+                      : undefined
+                  }
                   onAction={() => launch("show-portfolio")}
                 />
               );

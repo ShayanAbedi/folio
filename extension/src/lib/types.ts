@@ -1,7 +1,7 @@
 /**
- * Minimal, hand-written subset of the SnapTrade API models that Fathom reads.
+ * Minimal, hand-written subset of the SnapTrade API models that Folio reads.
  * Field names mirror the API (snake_case) so fixtures and live responses share one shape.
- * Everything here is read-only data; Fathom never writes to SnapTrade.
+ * Everything here is read-only data; Folio never writes to SnapTrade.
  */
 
 export interface CurrencyRef {
@@ -83,8 +83,49 @@ export interface OptionsPosition {
   };
   price?: number | null;
   units?: number;
+  /** Cost basis per contract. */
   average_purchase_price?: number | null;
   currency?: CurrencyRef | null;
+  /** Shares per contract; SnapTrade reports it on the new positions endpoint. Defaults to 100. */
+  multiplier?: number;
+}
+
+/** Instrument as returned by GET /accounts/{id}/positions/all (the replacement for the deprecated /holdings). */
+export interface Instrument {
+  kind: string;
+  id: string;
+  symbol: string;
+  raw_symbol?: string;
+  description?: string | null;
+  currency?: string | null;
+  exchange?: string | null;
+  // option-only
+  option_type?: "CALL" | "PUT";
+  strike_price?: string;
+  expiration_date?: string;
+  multiplier?: string;
+  underlying?: {
+    symbol?: string;
+    raw_symbol?: string;
+    description?: string | null;
+    currency?: string | null;
+    exchange?: string | null;
+  };
+}
+
+export interface AccountPosition {
+  instrument: Instrument;
+  units?: string | null;
+  price?: string | null;
+  /** Average purchase price per share (per share for options too). */
+  cost_basis?: string | null;
+  currency?: string | null;
+  cash_equivalent?: boolean;
+}
+
+export interface AllAccountPositionsResponse {
+  results?: AccountPosition[];
+  data_freshness?: { as_of?: string };
 }
 
 export interface AccountHoldings {
@@ -110,7 +151,7 @@ export interface Activity {
   settlement_date?: string;
   fee?: number;
   institution?: string;
-  /** Populated by the activities endpoint; Fathom also fills it in when it fans out per account. */
+  /** Populated by the activities endpoint; Folio also fills it in when it fans out per account. */
   account?: { id?: string; name?: string | null; number?: string } | null;
 }
 
@@ -151,7 +192,19 @@ export interface AccountSnapshot {
   dayChange?: { amount: number; currency: string; asOf: string };
 }
 
+/** An account whose data couldn't be loaded. The rest of the portfolio is still shown. */
+export interface AccountFailure {
+  account: Account;
+  message: string;
+}
+
 export interface PortfolioSnapshot {
   accounts: AccountSnapshot[];
+  failures: AccountFailure[];
   fetchedAt: string;
+}
+
+export interface ActivitiesResult {
+  activities: Activity[];
+  failures: AccountFailure[];
 }
