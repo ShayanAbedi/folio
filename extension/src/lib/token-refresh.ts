@@ -48,11 +48,14 @@ export interface TokenManagerDeps {
    * hasn't written it yet.
    */
   settleDelaysMs?: number[];
+  /** How long a request waits for an early refresh before going ahead with the current token. */
+  earlyRefreshWaitMs?: number;
 }
 
 /** Refresh this long before the real expiry so requests don't straddle it. */
 export const EXPIRY_MARGIN_MS = 5 * 60_000;
 const DEFAULT_SETTLE_DELAYS_MS = [250, 750, 1500];
+const DEFAULT_EARLY_REFRESH_WAIT_MS = 10_000;
 
 /**
  * True when the access token expires within `marginMs`. The margin is capped at half the token's
@@ -77,6 +80,7 @@ export function createTokenManager(deps: TokenManagerDeps) {
   const now = deps.now ?? Date.now;
   const sleep = deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
   const settleDelays = deps.settleDelaysMs ?? DEFAULT_SETTLE_DELAYS_MS;
+  const earlyWait = deps.earlyRefreshWaitMs ?? DEFAULT_EARLY_REFRESH_WAIT_MS;
 
   let inFlight: Promise<string> | null = null;
   /** The last rotation this process completed, so a caller holding the old refresh token doesn't spend it again. */
@@ -142,13 +146,25 @@ export function createTokenManager(deps: TokenManagerDeps) {
       if (!expiresSoon(tokens, t)) return tokens.accessToken;
       // Refreshing early, while the current token still works. If the refresh fails for any reason
       // other than a dead session (auth worker down or rate-limited, network), keep using the current
-      // token rather than failing every request; the next call tries again.
-      try {
-        return await refresh(tokens.refreshToken);
-      } catch (e) {
-        if (e instanceof AuthError && e.reason === "signed-out") throw e;
-        return tokens.accessToken;
-      }
+      // token rather than failing every request; the next call tries again. If the auth worker is
+      // slow, don't hold the request: go ahead with the current token and let the refresh finish on
+      // its own (it isn't cut off, since a refresh lost halfway would leave a spent refresh token).
+      const early = refresh(tokens.refreshToken).then(
+        (accessToken) => ({ accessToken }),
+        (error: unknown) => ({ error }),
+      );
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const waited = await Promise.race([
+        early,
+        new Promise<null>((r) => {
+          timer = setTimeout(() => r(null), earlyWait);
+        }),
+      ]);
+      clearTimeout(timer);
+      if (!waited) return tokens.accessToken;
+      if ("accessToken" in waited) return waited.accessToken;
+      if (waited.error instanceof AuthError && waited.error.reason === "signed-out") throw waited.error;
+      return tokens.accessToken;
     }
     // No refresh token: nothing to refresh with, so only give up once the token has really expired.
     if (opts.force || expiresSoon(tokens, t, 0)) {

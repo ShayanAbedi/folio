@@ -220,6 +220,19 @@ test("an early refresh that fails because the auth worker is down keeps using th
   assert.equal(store.removed, 0);
 });
 
+test("a slow auth worker during an early refresh doesn't hold requests; the refresh still lands", async () => {
+  const server = new FakeSnapTrade("rt0", 200);
+  const store = new SharedStore(tokensAged(36_000_000 - 2 * 60_000)); // inside the early window
+  const m = createTokenManager({ store, exchange: server.exchange, earlyRefreshWaitMs: 30 });
+  const started = Date.now();
+  assert.equal(await m.getAccessToken(), "at0", "goes ahead with the still-valid token");
+  assert.ok(Date.now() - started < 150, "didn't wait for the worker");
+  await sleep(250);
+  assert.equal(store.tokens?.refreshToken, "rt1", "the refresh finished and was stored");
+  assert.equal(await m.getAccessToken(), "at1");
+  assert.deepEqual(server.calls, ["rt0"], "one refresh, not one per request");
+});
+
 test("once the token has really expired, an auth-worker failure is reported instead of using it", async () => {
   const store = new SharedStore(tokensAged(36_000_000 + 1000));
   const m = createTokenManager({

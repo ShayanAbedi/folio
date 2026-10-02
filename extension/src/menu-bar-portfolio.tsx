@@ -28,7 +28,7 @@ export default function MenuBarPortfolio() {
         ? MASK
         : nw.primary
           ? formatMoney(nw.primary.amount, nw.primary.currency, { compact: true })
-          : error
+          : error && classifyError(error) === "sign-in"
             ? "Sign in"
             : "—";
   // Title layout: "<net worth> · ▲ <change>". The arrow glyph sits next to the number it describes; the icon stays neutral.
@@ -54,11 +54,15 @@ export default function MenuBarPortfolio() {
   // Flag it on the menu bar itself when the net worth shown isn't the whole, current picture.
   // A refresh failed while older data is still on screen (not the Signed out / error screen).
   const showingOld = Boolean(error) && accounts.length > 0;
+  // The session ended while older data is still on screen: say so and offer to sign in.
+  const signedOutWithData = showingOld && classifyError(error) === "sign-in";
   const degraded = showingOld || excluded > 0;
   const icon = degraded ? { source: Icon.Warning, tintColor: Color.Orange } : Icon.Coins;
   const tooltip = [
     "Folio · net worth.",
-    showingOld && snapshot ? `Couldn't refresh; showing data from ${formatAsOf(snapshot.fetchedAt)}.` : "",
+    showingOld && snapshot
+      ? `${signedOutWithData ? "Signed out" : "Couldn't refresh"}; showing data from ${formatAsOf(snapshot.fetchedAt)}.`
+      : "",
     excluded > 0 ? `Leaves out ${excluded} account${excluded === 1 ? "" : "s"}.` : "",
     delta !== null && primaryChange
       ? `The arrow is the change ${formatSnapshotPeriod(primaryChange)} between SnapTrade balance snapshots (including deposits).`
@@ -67,8 +71,6 @@ export default function MenuBarPortfolio() {
     .filter(Boolean)
     .join(" ");
   // When the data shown was fetched. After a failed refresh the previous data stays up, so say so.
-  // The session ended while older data is still on screen: say so and offer to sign in.
-  const signedOutWithData = showingOld && classifyError(error) === "sign-in";
   const updated = !snapshot
     ? null
     : isLoading
@@ -84,10 +86,18 @@ export default function MenuBarPortfolio() {
     <MenuBarExtra icon={icon} title={titleWithChange} tooltip={tooltip} isLoading={isLoading || acts.isLoading}>
       {error && accounts.length === 0 ? (
         <MenuBarExtra.Section title={classifyError(error) === "sign-in" ? "Signed out" : "Folio"}>
-          <MenuBarExtra.Item
-            title={classifyError(error) === "sign-in" ? "Sign In with SnapTrade…" : "Open Preferences…"}
-            onAction={() => (classifyError(error) === "sign-in" ? launch("sign-in") : openExtensionPreferences())}
-          />
+          {classifyError(error) === "sign-in" ? (
+            <MenuBarExtra.Item title="Sign In with SnapTrade…" onAction={() => launch("sign-in")} />
+          ) : classifyError(error) === "not-configured" ? (
+            <MenuBarExtra.Item title="Open Preferences…" onAction={openExtensionPreferences} />
+          ) : (
+            <MenuBarExtra.Item
+              icon={{ source: Icon.Warning, tintColor: Color.Orange }}
+              title="Couldn't load · Retry"
+              tooltip={error instanceof Error ? error.message : String(error)}
+              onAction={() => refreshTogether(revalidate, acts.revalidate)}
+            />
+          )}
         </MenuBarExtra.Section>
       ) : (
         <>

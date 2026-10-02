@@ -1,5 +1,6 @@
 import { useCachedState, usePromise } from "@raycast/utils";
 import { useCallback } from "react";
+import { AuthError, isSignedIn } from "./auth";
 import { cacheClear, VIEW_CACHE_NAMESPACE } from "./cache";
 import { ACTIVITY_WINDOW_DAYS, loadActivities, loadConnections, loadPortfolio } from "./data";
 import { authMode } from "./preferences";
@@ -34,7 +35,15 @@ function useLoaded<T>(key: string, load: () => Promise<T>, execute = true) {
   const [cached, setCached] = useCachedState<T | undefined>(key, undefined, { cacheNamespace: VIEW_CACHE_NAMESPACE });
   // The key carries everything the load depends on (mode, window), so passing it as the argument
   // re-runs the load when it changes. The load itself doesn't need it.
-  const run: (key: string) => Promise<T> = load;
+  const run: (key: string) => Promise<T> = async () => {
+    const value = await load();
+    // If the user signed out (in another command) while this load was running, don't write the
+    // result back into the view cache sign-out just cleared.
+    if (authMode() !== "fixtures" && !(await isSignedIn())) {
+      throw new AuthError("Session expired. Sign in again.", "signed-out");
+    }
+    return value;
+  };
   const { data, isLoading, error, revalidate } = usePromise(run, [key], {
     execute,
     onData: (value: T) => setCached(value),
