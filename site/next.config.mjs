@@ -1,6 +1,8 @@
 /**
  * Static export: `npm run build` writes a plain folder of HTML/CSS/JS to site/out
- * with no server, no cookies and no analytics.
+ * with no server and no cookies. Visit analytics (PostHog, cookieless, proxied
+ * through /ingest) are on only when NEXT_PUBLIC_POSTHOG_KEY is set at build time;
+ * see instrumentation-client.ts.
  *
  * SITE_URL drives everything. Deploying at a root domain:
  *   SITE_URL=https://folio.example npm run build

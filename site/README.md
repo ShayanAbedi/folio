@@ -1,7 +1,8 @@
 # folio-site
 
 The marketing page for Folio. One route, static export, no backend, no cookies, no
-analytics, no third-party requests at runtime (the webfont is self-hosted at build time).
+third-party requests at runtime (the webfont is self-hosted at build time). Visits are
+counted with PostHog, first-party and cookieless; see [Analytics](#analytics).
 
 ```bash
 npm install
@@ -81,13 +82,31 @@ content-hashed, so they must be allowed to go stale).
 That CSP is only possible because the page loads nothing from anywhere else. It needs
 `'unsafe-inline'` for scripts — a static export has no server to mint nonces for Next's
 two hydration scripts — but sources stay limited to `'self'`, which is what turns the
-page's "no third-party scripts" claim into something the browser enforces. Turning on
-Vercel Analytics would still be first-party and pass the CSP, but it would make the
-privacy section's "no analytics, no telemetry" untrue — change the copy if you enable it.
+page's "no third-party scripts" claim into something the browser enforces. The
+`/ingest` rewrites in `vercel.json` are what let PostHog live inside that CSP.
 
 Other hosts work the same way; only the header file differs. Cloudflare reads a
 `public/_headers` file, and an assets-only `wrangler.toml` deploying `out/` is in the
 git history at 34b887e if that route is ever wanted again.
+
+## Analytics
+
+`instrumentation-client.ts` starts PostHog (US Cloud) when the build has
+`NEXT_PUBLIC_POSTHOG_KEY` set — on Vercel, add it under Project → Settings →
+Environment Variables. Without it, or under `next dev`, nothing is sent.
+
+- `posthog-js` is bundled, and events go to `/ingest` on this domain, which
+  `vercel.json` rewrites to PostHog. Another host needs the same two rewrites.
+- `persistence: "memory"`: no cookies, no localStorage. Each visit is a new anonymous
+  visitor, so there are no returning-visitor or first-touch numbers.
+- Every event carries the visit's `utm_source`, `utm_medium`, `utm_campaign`,
+  `utm_content`, `utm_term`, referrer and landing URL. Tag links you share, e.g.
+  `https://folioext.com/?utm_source=reddit&utm_medium=social&utm_campaign=launch`.
+- `outbound_link_clicked` fires on any link off the site, with `href`, `text` and
+  `placement` (`header`, `install-heading`, `footer`…). A funnel from `$pageview` to
+  `outbound_link_clicked` where `href` contains `raycast.com`, broken down by
+  `utm_source`, shows which channel turns into installs.
+- No session recording, surveys or remotely loaded scripts.
 
 ## Raycast Store link
 
